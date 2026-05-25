@@ -1,43 +1,174 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import EventList from '../../components/EventList/EventList.jsx';
 import Search from '../../components/Search/Search.jsx';
 import Banner from '../../components/Banner/Banner.jsx';
+import { getCities, getConcerts, mapConcertToEventCard } from '../../api/client.js';
 import './HomePage.css';
 import '../../App.css';
 
+const pickDefaultCity = (cities) => {
+    const moscow = cities.find((c) => c.slug === 'moskva');
+    return moscow ?? cities[0] ?? null;
+};
+
 const HomePage = () => {
-    const concerts = [
-        {id: 'c-1', imgsrc:'/src/assets/icons/concert.jpg', title: 'DCOnTour', date: '12.12.2026', place: 'Циркус', artist: 'DK', cost: '5000'},
-        {id: 'c-2', imgsrc:'/src/assets/icons/concert.jpg', title: 'LidaSuperStar', date: '17.07.2026', place: 'Эрмитаж', artist: 'Lida', cost: '3000'},
-        {id: 'c-3', imgsrc:'/src/assets/icons/concert.jpg', title: 'DCOnTour', date: '12.12.2026', place: 'Циркус', artist: 'DK', cost: '5000'},
-        {id: 'c-4', imgsrc:'/src/assets/icons/concert.jpg', title: 'DCOnTour', date: '12.12.2026', place: 'Циркус', artist: 'DK', cost: '5000'},
-        {id: 'c-5', imgsrc:'/src/assets/icons/concert.jpg', title: 'DCOnTour', date: '12.12.2026', place: 'Циркус', artist: 'DK', cost: '5000'},
-        {id: 'c-6', imgsrc:'/src/assets/icons/concert.jpg', title: 'DCOnTour', date: '12.12.2026', place: 'Циркус', artist: 'DK', cost: '5000'},
-        {id: 'c-7', imgsrc:'/src/assets/icons/concert.jpg', title: 'DCOnTour', date: '12.12.2026', place: 'Циркус', artist: 'DK', cost: '5000'},
-        {id: 'c-8', imgsrc:'/src/assets/icons/concert.jpg', title: 'DCOnTour', date: '12.12.2026', place: 'Циркус', artist: 'DK', cost: '5000'},
-        {id: 'c-9', imgsrc:'/src/assets/icons/concert.jpg', title: 'DCOnTour', date: '12.12.2026', place: 'Циркус', artist: 'DK', cost: '5000'},
-        {id: 'c-10', imgsrc:'/src/assets/icons/concert.jpg', title: 'DCOnTour', date: '12.12.2026', place: 'Циркус', artist: 'DK', cost: '5000'},
-        {id: 'c-11', imgsrc:'/src/assets/icons/concert.jpg', title: 'DCOnTour', date: '12.12.2026', place: 'Циркус', artist: 'DK', cost: '5000'},
-    ]
+    const [cities, setCities] = useState([]);
+    const [citiesLoading, setCitiesLoading] = useState(true);
+    const [citiesError, setCitiesError] = useState(null);
+
+    const [selectedCityId, setSelectedCityId] = useState(null);
+
+    const [concerts, setConcerts] = useState([]);
+    const [totalCount, setTotalCount] = useState(0);
+    const [concertsLoading, setConcertsLoading] = useState(false);
+    const [concertsError, setConcertsError] = useState(null);
+
     const [searchTerm, setSearchTerm] = useState('');
-    const filteredConcerts = concerts.filter(concert =>
-      concert.artist.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+
+    const loadConcerts = useCallback(async (cityId, search) => {
+        if (!cityId) {
+            return;
+        }
+
+        setConcertsLoading(true);
+        setConcertsError(null);
+
+        try {
+            const result = await getConcerts({
+                cityId,
+                search: search || undefined,
+            });
+            setConcerts(result.items.map(mapConcertToEventCard));
+            setTotalCount(result.totalCount);
+        } catch (err) {
+            setConcerts([]);
+            setTotalCount(0);
+            setConcertsError(err instanceof Error ? err.message : 'Не удалось загрузить концерты');
+        } finally {
+            setConcertsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        const loadCities = async () => {
+            setCitiesLoading(true);
+            setCitiesError(null);
+
+            try {
+                const data = await getCities();
+                if (cancelled) {
+                    return;
+                }
+
+                setCities(data);
+                const defaultCity = pickDefaultCity(data);
+                if (defaultCity) {
+                    setSelectedCityId(defaultCity.id);
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    setCitiesError(
+                        err instanceof Error ? err.message : 'Не удалось загрузить города'
+                    );
+                }
+            } finally {
+                if (!cancelled) {
+                    setCitiesLoading(false);
+                }
+            }
+        };
+
+        loadCities();
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (selectedCityId) {
+            loadConcerts(selectedCityId, searchTerm);
+        }
+    }, [selectedCityId, searchTerm, loadConcerts]);
+
+    const handleCityChange = (city) => {
+        setSelectedCityId(city.id);
+        setSearchTerm('');
+    };
+
     const handleSearch = (term) => {
         setSearchTerm(term);
     };
-    return(
-    <div className='home__container'>
-      <Banner 
-        imageUrl="https://hq-oboi.ru/photo/temnyy_i_stilnye_abstrakciya_na_rabochiy_stol_1920x1200.jpg"/>
-      <Search onSearch={handleSearch}/>
-      <EventList concerts={filteredConcerts} />
-      {filteredConcerts.length === 0 && searchTerm && (
-        <div className="no-results">
-          <p>По запросу "{searchTerm}" ничего не найдено</p>
+
+    const handleRetry = () => {
+        if (citiesError) {
+            window.location.reload();
+            return;
+        }
+        if (selectedCityId) {
+            loadConcerts(selectedCityId, searchTerm);
+        }
+    };
+
+    const showNoResults =
+        !concertsLoading &&
+        !concertsError &&
+        selectedCityId &&
+        totalCount === 0;
+
+    return (
+        <div className="home__container">
+            <Banner imageUrl="https://hq-oboi.ru/photo/temnyy_i_stilnye_abstrakciya_na_rabochiy_stol_1920x1200.jpg" />
+            <Search
+                key={selectedCityId ?? 'no-city'}
+                onSearch={handleSearch}
+                cities={cities}
+                citiesLoading={citiesLoading}
+                selectedCityId={selectedCityId}
+                onCityChange={handleCityChange}
+            />
+
+            {citiesError && (
+                <div className="home__status home__status--error">
+                    <p>{citiesError}</p>
+                    <button type="button" className="home__retry" onClick={handleRetry}>
+                        Повторить
+                    </button>
+                </div>
+            )}
+
+            {concertsLoading && (
+                <p className="home__status home__status--loading">Загрузка...</p>
+            )}
+
+            {concertsError && !citiesError && (
+                <div className="home__status home__status--error">
+                    <p>{concertsError}</p>
+                    <button type="button" className="home__retry" onClick={handleRetry}>
+                        Повторить
+                    </button>
+                </div>
+            )}
+
+            {!concertsLoading && !concertsError && selectedCityId && (
+                <EventList concerts={concerts} />
+            )}
+
+            {showNoResults && searchTerm && (
+                <div className="no-results">
+                    <p>По запросу &quot;{searchTerm}&quot; ничего не найдено</p>
+                </div>
+            )}
+
+            {showNoResults && !searchTerm && (
+                <div className="no-results">
+                    <p>В этом городе пока нет концертов</p>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-    )
-}
-export default HomePage
+    );
+};
+
+export default HomePage;

@@ -1,3 +1,28 @@
 .home__container{
     background-color: var(--c-violet-dark);
 }
+
+.home__status {
+    text-align: center;
+    padding: var(--r-spacing-md);
+    color: var(--c-light);
+    font-size: var(--fs-md);
+}
+
+.home__status--loading {
+    opacity: 0.85;
+}
+
+.home__status--error p {
+    margin-bottom: var(--r-spacing-sm);
+}
+
+.home__retry {
+    padding: var(--r-spacing-xs) var(--r-spacing-md);
+    background-color: var(--c-light);
+    color: var(--c-violet-dark);
+    border: none;
+    border-radius: var(--r-radius);
+    font-family: var(--font-family);
+    cursor: pointer;
+}

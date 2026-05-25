@@ -17,6 +17,11 @@
     gap: var(--r-spacing-xs);
     white-space: nowrap;
 }
+
+.city-selector__trigger--disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
 .city-selector__icon{
     width: 1.5rem;
 }

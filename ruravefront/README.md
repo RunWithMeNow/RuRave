@@ -1,12 +1,70 @@
-# React + Vite
+# RuRave Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Главная страница сервиса концертов (React + Vite). Данные с RuRave API.
 
-Currently, two official plugins are available:
+## Требования
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node.js 18+
+- Запущенный [RuRave API](../rurave-api/README.md) с применёнными миграциями и seed
 
-## Expanding the ESLint configuration
+## Быстрый старт
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 1. Настройка API URL
+
+```bash
+cd ruravefront
+copy .env.example .env
+```
+
+В `.env` укажите URL бэкенда (как в консоли при `dotnet run` / Visual Studio):
+
+```
+# профиль https (часто по умолчанию в VS):
+VITE_API_BASE_URL=https://localhost:7097
+
+# профиль http:
+# VITE_API_BASE_URL=http://localhost:5080
+```
+
+Порт **7097** = HTTPS, **5080** = HTTP. Должен совпадать с `launchSettings.json`.
+
+### 2. Установка зависимостей
+
+```bash
+npm install
+```
+
+### 3. Порядок запуска (важно)
+
+1. **БД** — миграции + seed на бэкенде (`dotnet ef database update`, `scripts/seed.ps1`)
+2. **API** — `dotnet run --project src/RuRave.Api` (из `rurave-api`)
+3. **Фронт** — `npm run dev` → http://localhost:5173
+
+```bash
+npm run dev
+```
+
+## Проверка MVP
+
+- При открытии загружаются города; по умолчанию выбрана **Москва**
+- Список концертов меняется при смене города
+- «Найти» отправляет `search` на API (например `DK`, `Lida`)
+- Карточки: дата, площадка, артисты, «от N руб.»
+
+При ошибке CORS проверьте, что API запущен и в `rurave-api` включён CORS для `http://localhost:5173`.
+
+## Скрипты
+
+| Команда | Описание |
+|---------|----------|
+| `npm run dev` | Dev-сервер Vite |
+| `npm run build` | Production-сборка |
+| `npm run preview` | Просмотр сборки |
+
+## Структура (главная)
+
+- `src/api/client.js` — запросы к API
+- `src/pages/HomePage/` — состояние загрузки, город, концерты
+- `src/components/Search/`, `CitySelector/`, `EventList/`, `EventCard/`
+
+Страница деталей концерта («Подробнее») — не реализована (см. roadmap в README API).

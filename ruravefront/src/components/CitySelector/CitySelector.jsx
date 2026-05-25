@@ -2,49 +2,65 @@ import { useState } from 'react';
 import './CitySelector.css';
 import '../../App.css';
 
-const CitySelector = (props) => {
+const CitySelector = ({
+    cities = [],
+    selectedCityId = null,
+    onCitySelect,
+    disabled = false,
+}) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedCity, setSelectedCity] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const {cities = []} = props;
-    
+
+    const selectedCity = cities.find((city) => city.id === selectedCityId) ?? null;
+
     const handleCitySelect = (city) => {
-        setSelectedCity(city);
+        onCitySelect?.(city);
         setIsOpen(false);
         setSearchTerm('');
     };
-    
-    const filteredCities = cities.filter(city => 
-        city.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const filteredCities = cities.filter((city) =>
+        city.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    
+
     return (
         <div className="city-selector">
-            <button 
-                className="city-selector__trigger"
-                onClick={() => setIsOpen(!isOpen)}>
-                <img className="city-selector__icon" 
-                     src="/src/assets/icons/place.png"/>
-                {selectedCity ? selectedCity : 'Выберите город'}
+            <button
+                type="button"
+                className={`city-selector__trigger${disabled ? ' city-selector__trigger--disabled' : ''}`}
+                onClick={() => !disabled && setIsOpen(!isOpen)}
+                disabled={disabled}
+            >
+                <img
+                    className="city-selector__icon"
+                    src="/src/assets/icons/place.png"
+                    alt=""
+                />
+                {disabled
+                    ? 'Загрузка городов...'
+                    : selectedCity
+                      ? selectedCity.name
+                      : 'Выберите город'}
                 <span className={`city-selector__arrow ${isOpen ? 'open' : ''}`}>▼</span>
             </button>
 
-            {isOpen && (
+            {isOpen && !disabled && (
                 <div className="city-selector__overlay" onClick={() => setIsOpen(false)}>
                     <div className="city-selector__modal" onClick={(e) => e.stopPropagation()}>
                         <div className="city-selector__header">
                             <h3 className="city-selector__title">Выберите город</h3>
-                            <button 
+                            <button
+                                type="button"
                                 className="city-selector__close"
                                 onClick={() => setIsOpen(false)}
                             >
                                 ✕
                             </button>
                         </div>
-                        
+
                         <div className="city-selector__search">
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 placeholder="Поиск города..."
                                 className="city-selector__search-input"
                                 value={searchTerm}
@@ -55,12 +71,12 @@ const CitySelector = (props) => {
                         <ul className="city-selector__list">
                             {filteredCities.length > 0 ? (
                                 filteredCities.map((city) => (
-                                    <li 
-                                        className={`city-selector__item ${selectedCity === city ? 'city-selector__item--selected' : ''}`}
-                                        key={city}
+                                    <li
+                                        className={`city-selector__item ${selectedCityId === city.id ? 'city-selector__item--selected' : ''}`}
+                                        key={city.id}
                                         onClick={() => handleCitySelect(city)}
                                     >
-                                        {city}
+                                        {city.name}
                                     </li>
                                 ))
                             ) : (
