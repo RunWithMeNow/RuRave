@@ -1,0 +1,57 @@
+.search__wrapper {
+    display: flex;
+    background-color: var(--c-violet-dark);
+    padding: var(--r-spacing-sm);
+    margin: 0;
+}
+.search-artist__container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+.search__form {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    font-family: var(--font-family);
+    width: 70%;
+}
+
+.search__container {
+    display: flex;
+    gap: var(--r-spacing-xs);
+    border: 2px solid var(--c-lighter);
+    border-radius: var(--r-spacing-xs);
+    width: 100%;
+}
+
+.search__input {
+    font-size: var(--fs-md);
+    color: var(--c-light);
+    padding: 0.3rem;
+    background-color: var(--c-violet-dark);
+    border: none;
+    border-radius: var(--r-spacing-xs);
+    flex: 1;
+}
+
+.search__input::placeholder {
+    color: var(--c-light);
+}
+
+.search__button {
+    border-radius: 0.3rem;
+    border: none;
+    width: 4rem;
+    height: 2rem;
+    color: var(--c-light);
+    font-size: var(--fs-md);
+    background-color: var(--c-violet-light);
+    cursor: pointer;
+    transition: var(--tr);
+}
+
+.search__button:hover {
+    box-shadow: var(--shadow-hover);
+}

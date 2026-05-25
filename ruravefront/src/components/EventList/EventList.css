@@ -1,0 +1,9 @@
+.concerts__list{
+  display: flex;
+  list-style-type: none;
+  margin: 0;
+  padding: var(--r-spacing-md);
+  justify-content:start;
+  gap: var(--r-spacing-md);
+  flex-wrap: wrap;
+}

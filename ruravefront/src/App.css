@@ -1,0 +1,35 @@
+:root {
+  --font-family: "Rubik", sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem; 
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.5rem;
+
+  --c-black: #0a0a0f;
+  --c-dark: #0f0f1a;
+  --c-darker: #07070d;
+  --c-light: #e8eaf6;
+  --c-lighter: #a0a4b8;
+  --c-green: #2ecc71;
+  --c-green-dark: #0e6b2e;
+  --c-violet-dark: #2a1a3a;
+  --c-violet-light: #9b59b6;
+  --c-blue-accent: #3498db;
+  --c-blue-dark: #1a4d6b;
+
+  --r-radius: 0.85rem;
+  --r-spacing-xs: 0.5rem;
+  --r-spacing-sm: 0.75rem;
+  --r-spacing-md: 1rem;
+  --r-spacing-lg: 1.25rem;
+
+  --shadow-base: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 0.9375rem 2.5rem var(--c-blue-accent);
+
+  --tr: 0.3s ease;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
