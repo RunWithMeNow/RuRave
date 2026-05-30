@@ -17,6 +17,10 @@ public class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : IExcepti
                 StatusCodes.Status404NotFound,
                 "City not found",
                 cityNotFound.Message),
+            ConcertNotFoundException concertNotFound => (
+                StatusCodes.Status404NotFound,
+                "Concert not found",
+                concertNotFound.Message),
             InvalidQueryException invalidQuery => (
                 StatusCodes.Status400BadRequest,
                 "Invalid query",

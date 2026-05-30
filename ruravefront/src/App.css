@@ -1,35 +1,391 @@
+/* Primitives — не зависят от темы */
+
 :root {
+
   --font-family: "Rubik", sans-serif;
+
+
+
+  /* Типографика — роли (этап 7)
+
+   * --fs-xl  → H1 секции («Концерты в Москве»)
+
+   * --fs-lg  → H2 / заголовок карточки
+
+   * --fs-md  → body (кнопки, input)
+
+   * --fs-sm  → caption (дата, место, подписи)
+
+   * --fs-xs  → micro (бейджи, стрелки)
+
+   */
+
   --fs-xs: 0.75rem;
-  --fs-sm: 0.875rem; 
+
+  --fs-sm: 0.875rem;
+
   --fs-md: 1rem;
+
   --fs-lg: 1.125rem;
+
   --fs-xl: 1.5rem;
 
+
+
+  --lh-tight: 1.2;
+
+  --lh-normal: 1.5;
+
+
+
   --c-black: #0a0a0f;
+
   --c-dark: #0f0f1a;
+
   --c-darker: #07070d;
+
   --c-light: #e8eaf6;
+
   --c-lighter: #a0a4b8;
+
   --c-green: #2ecc71;
+
   --c-green-dark: #0e6b2e;
+
   --c-violet-dark: #2a1a3a;
+
   --c-violet-light: #9b59b6;
+
   --c-blue-accent: #3498db;
+
   --c-blue-dark: #1a4d6b;
 
+
+
   --r-radius: 0.85rem;
+
   --r-spacing-xs: 0.5rem;
+
   --r-spacing-sm: 0.75rem;
+
   --r-spacing-md: 1rem;
+
   --r-spacing-lg: 1.25rem;
 
-  --shadow-base: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.5);
-  --shadow-hover: 0 0.9375rem 2.5rem var(--c-blue-accent);
+
 
   --tr: 0.3s ease;
+
+
+
+  /* Breakpoints (этап 9) */
+
+  --bp-sm: 480px;
+
+  --bp-md: 768px;
+
+  --bp-lg: 1024px;
+
+
+
+  /* Высота sticky header (этап 10) */
+
+  --header-height: 4.5rem;
+
 }
-* {
+
+
+
+/* Тёмная тема (default) */
+
+[data-theme="dark"] {
+
+  --bg-page: #1e1428;
+
+  --bg-surface: #0f0f1a;
+
+  --bg-elevated: #0a0a0f;
+
+  --bg-header: #0a0a0f;
+
+  --text-primary: #e8eaf6;
+
+  --text-secondary: #a0a4b8;
+
+  --text-on-accent: #0f0f1a;
+
+  --border-default: rgba(160, 164, 184, 0.35);
+
+  --accent-primary: #9b59b6;
+
+  --accent-success: #2ecc71;
+
+  --accent-link: #3498db;
+
+  --shadow-base: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+  --shadow-hover: 0 15px 40px rgba(52, 152, 219, 0.35);
+
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+
+  --city-trigger-bg: #e8eaf6;
+
+  --city-trigger-text: #2a1a3a;
+
+  --input-bg: #2a1a3a;
+
+  --item-hover-bg: #2a1a3a;
+
+  --card-border: transparent;
+
+  --scrollbar-track: #2a1a3a;
+
+  --scrollbar-thumb: #9b59b6;
+
+}
+
+
+
+/* Светлая тема */
+
+[data-theme="light"] {
+
+  --bg-page: #f0edf5;
+
+  --bg-surface: #ffffff;
+
+  --bg-elevated: #e8e4f0;
+
+  --bg-header: #ffffff;
+
+  --text-primary: #1a1225;
+
+  --text-secondary: #5c5470;
+
+  --text-on-accent: #ffffff;
+
+  --border-default: rgba(155, 89, 182, 0.25);
+
+  --accent-primary: #7d3c98;
+
+  --accent-success: #27ae60;
+
+  --accent-link: #2980b9;
+
+  --shadow-base: 0 8px 24px rgba(42, 26, 58, 0.12);
+
+  --shadow-hover: 0 12px 32px rgba(52, 152, 219, 0.2);
+
+  --overlay-bg: rgba(26, 18, 37, 0.5);
+
+  --city-trigger-bg: #7d3c98;
+
+  --city-trigger-text: #ffffff;
+
+  --input-bg: #f0edf5;
+
+  --item-hover-bg: #e8e4f0;
+
+  --card-border: rgba(155, 89, 182, 0.25);
+
+  --scrollbar-track: #e8e4f0;
+
+  --scrollbar-thumb: #7d3c98;
+
+}
+
+
+
+*,
+
+*::before,
+
+*::after {
+
+  box-sizing: border-box;
+
   margin: 0;
+
   padding: 0;
+
 }
+
+
+
+body {
+
+  font-family: var(--font-family);
+
+  font-size: var(--fs-md);
+
+  line-height: var(--lh-normal);
+
+  background: var(--bg-page);
+
+  color: var(--text-primary);
+
+  min-height: 100vh;
+
+  -webkit-font-smoothing: antialiased;
+
+  -moz-osx-font-smoothing: grayscale;
+
+  transition:
+
+    background-color var(--tr),
+
+    color var(--tr);
+
+}
+
+
+
+.App {
+
+  min-height: 100vh;
+
+  display: flex;
+
+  flex-direction: column;
+
+  overflow-x: hidden;
+
+}
+
+
+
+.layout-container {
+
+  width: 100%;
+
+  max-width: 1280px;
+
+  margin-inline: auto;
+
+  padding-inline: var(--r-spacing-md);
+
+}
+
+
+
+.section-spacing {
+
+  padding-block: var(--r-spacing-lg);
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: var(--r-spacing-md);
+
+}
+
+
+
+/* Доступность (этап 8) */
+
+:focus-visible {
+
+  outline: 2px solid var(--accent-primary);
+
+  outline-offset: 2px;
+
+}
+
+
+
+:focus:not(:focus-visible) {
+
+  outline: none;
+
+}
+
+
+
+.sr-only {
+
+  position: absolute;
+
+  width: 1px;
+
+  height: 1px;
+
+  padding: 0;
+
+  margin: -1px;
+
+  overflow: hidden;
+
+  clip: rect(0, 0, 0, 0);
+
+  white-space: nowrap;
+
+  border: 0;
+
+}
+
+
+
+.skip-link {
+
+  position: absolute;
+
+  top: var(--r-spacing-sm);
+
+  left: var(--r-spacing-sm);
+
+  z-index: 200;
+
+  padding: var(--r-spacing-xs) var(--r-spacing-md);
+
+  font-family: var(--font-family);
+
+  font-size: var(--fs-sm);
+
+  color: var(--text-on-accent);
+
+  background-color: var(--text-primary);
+
+  border-radius: var(--r-radius);
+
+  text-decoration: none;
+
+  transform: translateY(-200%);
+
+  transition: transform var(--tr);
+
+}
+
+
+
+.skip-link:focus {
+
+  transform: translateY(0);
+
+}
+
+
+
+#main-content {
+
+  flex: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  min-height: 0;
+
+  padding-top: var(--header-height);
+
+}
+
+
+
+#main-content:focus {
+
+  outline: none;
+
+}
+
+

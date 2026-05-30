@@ -1,0 +1,217 @@
+.concert-page {
+  background-color: var(--bg-page);
+  min-height: calc(100vh - var(--header-height));
+  padding: var(--r-spacing-lg) 0 var(--r-spacing-xl);
+}
+
+.concert-page__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-spacing-md);
+}
+
+.concert-page__back {
+  align-self: flex-start;
+  text-decoration: none;
+}
+
+.concert-page__article {
+  background-color: var(--bg-surface);
+  border-radius: var(--r-radius);
+  box-shadow: var(--shadow-base);
+  overflow: hidden;
+}
+
+.concert-page__hero {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  background-color: var(--bg-elevated);
+}
+
+.concert-page__hero--fallback {
+  object-fit: contain;
+  padding: var(--r-spacing-lg);
+}
+
+.concert-page__body {
+  padding: var(--r-spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-spacing-md);
+}
+
+.concert-page__title {
+  font-size: var(--fs-xl);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: var(--lh-tight);
+}
+
+.concert-page__meta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-spacing-sm);
+}
+
+.concert-page__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.concert-page__meta-label {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.concert-page__meta-value {
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+}
+
+.concert-page__section-title {
+  font-size: var(--fs-lg);
+  color: var(--text-primary);
+  margin: 0 0 var(--r-spacing-xs);
+}
+
+.concert-page__description {
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+  line-height: var(--lh-normal);
+  margin: 0;
+}
+
+.concert-page__tickets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-spacing-xs);
+}
+
+.concert-page__ticket {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--r-spacing-sm);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-radius);
+  gap: var(--r-spacing-sm);
+}
+
+.concert-page__ticket-name {
+  color: var(--text-primary);
+  font-size: var(--fs-md);
+}
+
+.concert-page__ticket-price {
+  color: var(--accent-success);
+  font-weight: 600;
+  font-size: var(--fs-md);
+  white-space: nowrap;
+}
+
+.concert-page__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--r-spacing-md);
+  padding-top: var(--r-spacing-sm);
+  border-top: 1px solid var(--border-default);
+}
+
+.concert-page__price {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--accent-success);
+  margin: 0;
+}
+
+.concert-page__buy {
+  background-color: var(--accent-success);
+  color: var(--text-on-accent, #0a0a0f);
+  font-size: var(--fs-md);
+  font-family: var(--font-family);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--r-radius);
+  padding: var(--r-spacing-sm) var(--r-spacing-lg);
+  min-height: 2.75rem;
+  cursor: pointer;
+  transition:
+    background-color var(--tr),
+    transform var(--tr);
+}
+
+.concert-page__buy:hover {
+  filter: brightness(1.08);
+  transform: translateY(-0.0625rem);
+}
+
+.concert-page__buy:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.concert-page__loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-spacing-md);
+}
+
+.concert-page__skeleton {
+  border-radius: var(--r-radius);
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 0%,
+    var(--bg-elevated) 50%,
+    var(--bg-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: concert-page-shimmer 1.2s ease-in-out infinite;
+}
+
+.concert-page__skeleton--hero {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+}
+
+.concert-page__skeleton--title {
+  height: 2rem;
+  width: 70%;
+}
+
+.concert-page__skeleton--line {
+  height: 1rem;
+  width: 100%;
+}
+
+@keyframes concert-page-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .concert-page__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .concert-page__buy {
+    width: 100%;
+  }
+}

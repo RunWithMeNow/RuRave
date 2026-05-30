@@ -37,13 +37,66 @@ export async function getCities() {
     return request('/api/cities');
 }
 
-export async function getConcerts({ cityId, search, page = 1, pageSize = 20 }) {
+export async function getConcerts({
+    cityId,
+    search,
+    dateFrom,
+    dateTo,
+    page = 1,
+    pageSize = 12,
+}) {
     return request('/api/concerts', {
         cityId,
         search: search?.trim() || undefined,
+        dateFrom,
+        dateTo,
         page,
         pageSize,
     });
+}
+
+export async function getConcertDates({ cityId, from, to, search }) {
+    return request('/api/concerts/dates', {
+        cityId,
+        from,
+        to,
+        search: search?.trim() || undefined,
+    });
+}
+
+export async function getConcertById(id) {
+    return request(`/api/concerts/${id}`);
+}
+
+export function mapConcertDetailToView(concert) {
+    const startsAt = new Date(concert.startsAt);
+    const dateTime = startsAt.toLocaleString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+
+    return {
+        id: concert.id,
+        imgsrc: concert.imageUrl,
+        title: concert.title,
+        description: concert.description?.trim() ?? '',
+        dateTime,
+        place: concert.place,
+        venueAddress: concert.venueAddress?.trim() || '',
+        mapSearchQuery: concert.mapSearchQuery?.trim() ?? '',
+        cityName: concert.cityName,
+        artist: concert.artistDisplay,
+        artists: concert.artists ?? [],
+        cost: concert.minPrice,
+        ticketCategories: (concert.ticketCategories ?? []).map((tc) => ({
+            name: tc.name,
+            price: tc.price,
+            sortOrder: tc.sortOrder,
+        })),
+    };
 }
 
 export function mapConcertToEventCard(concert) {
@@ -57,6 +110,7 @@ export function mapConcertToEventCard(concert) {
         id: concert.id,
         imgsrc: concert.imageUrl,
         title: concert.title,
+        startsAt: concert.startsAt,
         date,
         place: concert.place,
         artist: concert.artistDisplay,

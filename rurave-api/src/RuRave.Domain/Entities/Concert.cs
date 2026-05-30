@@ -16,6 +16,8 @@ public class Concert
 
     public string ImageUrl { get; set; } = null!;
 
+    public string Description { get; set; } = string.Empty;
+
     public ConcertStatus Status { get; set; }
 
     public Venue Venue { get; set; } = null!;

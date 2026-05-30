@@ -50,8 +50,12 @@ npm run dev
 - Список концертов меняется при смене города
 - «Найти» отправляет `search` на API (например `DK`, `Lida`)
 - Карточки: дата, площадка, артисты, «от N руб.»
+- «Подробнее» → `/concert/:id` — описание, билеты, карта OSM по адресу, «Купить билет» (заглушка)
+- Навигация: **Афиша**, **О проекте**, **Профиль**
 
-При ошибке CORS проверьте, что API запущен и в `rurave-api` включён CORS для `http://localhost:5173`.
+Полный сценарий демо: `Desktop\RuRave-MVP-Этапы\MVP-DEMO.md`.
+
+При ошибке CORS проверьте, что API запущен и в `rurave-api` включён CORS для `http://localhost:5173`. После обновления API выполните миграцию `AddConcertDescription` и `scripts\seed.ps1`.
 
 ## Скрипты
 
@@ -61,10 +65,27 @@ npm run dev
 | `npm run build` | Production-сборка |
 | `npm run preview` | Просмотр сборки |
 
+## UI и дизайн-система
+
+Перед разработкой стилей и новых экранов:
+
+| Документ | Описание |
+|----------|----------|
+| [docs/UI-DESIGN-SYSTEM.md](./docs/UI-DESIGN-SYSTEM.md) | Токены, темы, компоненты, правила, anti-patterns |
+| [docs/UI-IMPLEMENTATION-LOG.md](./docs/UI-IMPLEMENTATION-LOG.md) | Журнал решений по этапам внедрения |
+| [docs/README.md](./docs/README.md) | Оглавление документации UI |
+
+Пошаговые промпты внедрения: `Desktop\RuRave-UI-Этапы\`.
+
 ## Структура (главная)
 
 - `src/api/client.js` — запросы к API
 - `src/pages/HomePage/` — состояние загрузки, город, концерты
-- `src/components/Search/`, `CitySelector/`, `EventList/`, `EventCard/`
+- `src/components/Search/`, `CitySelector/`, `EventList/`, `EventCard/`, `PageLayout/`
+- `src/pages/ConcertPage/` — детали концерта
+- `src/pages/AboutPage/`, `ProfilePage/`
+- `src/components/BuyTicketModal/` — заглушка оплаты
+- `src/components/VenueMap/` — OpenStreetMap + Nominatim по `mapSearchQuery`
+- `docs/` — дизайн-система и журнал UI-решений
 
-Страница деталей концерта («Подробнее») — не реализована (см. roadmap в README API).
+Промпты ядра MVP: `Desktop\RuRave-MVP-Этапы\`.

@@ -1,9 +1,59 @@
-.concerts__list{
-  display: flex;
+.concerts__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--r-spacing-lg);
   list-style-type: none;
   margin: 0;
-  padding: var(--r-spacing-md);
-  justify-content:start;
-  gap: var(--r-spacing-md);
-  flex-wrap: wrap;
+  padding: 0;
+}
+
+.concerts__list--animate {
+  animation: concerts-list-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.concerts__list-item {
+  display: flex;
+  min-width: 0;
+}
+
+.concerts__list--animate .concerts__list-item {
+  animation: concert-card-enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes concerts-list-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes concert-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.97);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .concerts__list--animate {
+    animation: none;
+  }
+
+  .concerts__list--animate .concerts__list-item {
+    animation: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .concerts__list {
+    grid-template-columns: 1fr;
+  }
 }

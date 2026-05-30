@@ -58,6 +58,28 @@ public class ApiEndpointTests(ApiWebApplicationFactory factory)
     }
 
     [Fact]
+    public async Task GetConcerts_QueryDateFromTo_FiltersByHttpQueryString()
+    {
+        var cities = await (await _client.GetAsync("/api/cities"))
+            .Content.ReadFromJsonAsync<List<CityListItemDto>>(JsonOptions);
+        var moscowId = cities!.Single(c => c.Slug == "moskva").Id;
+
+        var inRange = await _client.GetAsync(
+            $"/api/concerts?cityId={moscowId}&dateFrom=2026-08-01&dateTo=2026-08-31");
+        Assert.Equal(HttpStatusCode.OK, inRange.StatusCode);
+        var august = await inRange.Content.ReadFromJsonAsync<PagedResultDto<ConcertListItemDto>>(JsonOptions);
+        Assert.NotNull(august);
+        Assert.Single(august!.Items);
+
+        var outOfRange = await _client.GetAsync(
+            $"/api/concerts?cityId={moscowId}&dateFrom=2026-09-01&dateTo=2026-09-30");
+        Assert.Equal(HttpStatusCode.OK, outOfRange.StatusCode);
+        var september = await outOfRange.Content.ReadFromJsonAsync<PagedResultDto<ConcertListItemDto>>(JsonOptions);
+        Assert.NotNull(september);
+        Assert.Empty(september!.Items);
+    }
+
+    [Fact]
     public async Task GetConcerts_CityNotFound_Returns404()
     {
         var response = await _client.GetAsync("/api/concerts?cityId=99999");
@@ -78,5 +100,52 @@ public class ApiEndpointTests(ApiWebApplicationFactory factory)
         Assert.NotNull(page);
         Assert.Single(page.Items);
         Assert.Equal("LidaSuperStar", page.Items[0].Title);
+    }
+
+    [Fact]
+    public async Task GetConcertById_ReturnsOkWithDetail()
+    {
+        var cities = await (await _client.GetAsync("/api/cities"))
+            .Content.ReadFromJsonAsync<List<CityListItemDto>>(JsonOptions);
+        var moscowId = cities!.Single(c => c.Slug == "moskva").Id;
+
+        var listResponse = await _client.GetAsync($"/api/concerts?cityId={moscowId}");
+        var page = await listResponse.Content.ReadFromJsonAsync<PagedResultDto<ConcertListItemDto>>(JsonOptions);
+        var concertId = page!.Items[0].Id;
+
+        var response = await _client.GetAsync($"/api/concerts/{concertId}");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var detail = await response.Content.ReadFromJsonAsync<ConcertDetailDto>(JsonOptions);
+        Assert.NotNull(detail);
+        Assert.Equal("Festival Night", detail.Title);
+        Assert.Equal(2, detail.TicketCategories.Count);
+        Assert.False(string.IsNullOrWhiteSpace(detail.Description));
+        Assert.False(string.IsNullOrWhiteSpace(detail.MapSearchQuery));
+        Assert.Contains("Москва", detail.MapSearchQuery);
+    }
+
+    [Fact]
+    public async Task GetConcertById_NotFound_Returns404()
+    {
+        var response = await _client.GetAsync("/api/concerts/99999");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetConcertById_Draft_Returns404()
+    {
+        var cities = await (await _client.GetAsync("/api/cities"))
+            .Content.ReadFromJsonAsync<List<CityListItemDto>>(JsonOptions);
+        var moscowId = cities!.Single(c => c.Slug == "moskva").Id;
+        var page = await (await _client.GetAsync($"/api/concerts?cityId={moscowId}"))
+            .Content.ReadFromJsonAsync<PagedResultDto<ConcertListItemDto>>(JsonOptions);
+        var draftId = page!.Items[0].Id + 1;
+
+        var response = await _client.GetAsync($"/api/concerts/{draftId}");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

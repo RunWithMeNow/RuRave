@@ -22,5 +22,26 @@ public static class ConcertQueryValidator
         {
             throw new InvalidQueryException($"PageSize must be between 1 and {MaxPageSize}.");
         }
+
+        ConcertDateRange.Validate(request.DateFrom, request.DateTo);
+    }
+
+    public static void ValidateDatesRequest(GetConcertDatesRequest request)
+    {
+        if (request.CityId <= 0)
+        {
+            throw new InvalidQueryException("CityId must be greater than zero.");
+        }
+
+        if (request.From > request.To)
+        {
+            throw new InvalidQueryException("'from' must be less than or equal to 'to'.");
+        }
+
+        var spanDays = request.To.DayNumber - request.From.DayNumber;
+        if (spanDays > ConcertDateRange.MaxRangeDays)
+        {
+            throw new InvalidQueryException($"Date range must not exceed {ConcertDateRange.MaxRangeDays} days.");
+        }
     }
 }

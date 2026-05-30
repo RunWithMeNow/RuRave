@@ -1,12 +1,95 @@
 .banner-container {
-    width: 100%;
-    margin: 0;
-    overflow: hidden;
+  position: relative;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  background-color: var(--bg-elevated);
+  min-height: clamp(14rem, 28vw, 22rem);
+}
+
+/* Затемнение низа кадра (силуэты толпы) + лёгкий виньет по краям */
+.banner-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(10, 10, 15, 0.25) 55%,
+      rgba(10, 10, 15, 0.65) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgba(10, 10, 15, 0.2) 0%,
+      transparent 20%,
+      transparent 80%,
+      rgba(10, 10, 15, 0.2) 100%
+    );
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme='light'] .banner-container::before {
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(26, 18, 37, 0.12) 50%,
+      rgba(240, 237, 245, 0.75) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgba(240, 237, 245, 0.15) 0%,
+      transparent 25%,
+      transparent 75%,
+      rgba(240, 237, 245, 0.15) 100%
+    );
+}
+
+.banner-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 18%,
+    color-mix(in srgb, var(--bg-page) 45%, transparent) 62%,
+    var(--bg-page) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
 }
 
 .banner-image {
-    width: 100%;
-    height: 20rem;
-    display: block;
-    object-fit: cover;
+  width: 100%;
+  height: clamp(14rem, 28vw, 22rem);
+  display: block;
+  object-fit: cover;
+  /* Кадр опущен: больше толпы, прожектор выше обрезки */
+  object-position: center 58%;
+  /* Чуть «чётче» на глаз: контраст/насыщенность (не заменяет мелкий исходник) */
+  filter: contrast(1.07) saturate(1.1) brightness(1.02);
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  image-rendering: auto;
+}
+
+[data-theme='light'] .banner-image {
+  filter: contrast(1.05) saturate(1.06) brightness(1.01);
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .banner-image {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-container,
+  .banner-image {
+    min-height: 12rem;
+    height: clamp(12rem, 42vw, 18rem);
+    object-position: center 62%;
+  }
 }

@@ -27,6 +27,10 @@ public class ConcertConfiguration : IEntityTypeConfiguration<Concert>
             .IsRequired()
             .HasMaxLength(1000);
 
+        builder.Property(c => c.Description)
+            .IsRequired()
+            .HasMaxLength(4000);
+
         builder.HasIndex(c => new { c.Status, c.StartsAt });
 
         builder.HasOne(c => c.Venue)

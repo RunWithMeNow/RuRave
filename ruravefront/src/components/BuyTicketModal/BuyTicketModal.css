@@ -1,0 +1,117 @@
+.buy-ticket-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlay-bg);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: var(--r-spacing-md);
+  animation: fadeIn 0.2s ease;
+}
+
+.buy-ticket-modal {
+  background-color: var(--bg-surface);
+  border-radius: var(--r-radius);
+  width: 100%;
+  max-width: 28rem;
+  box-shadow: var(--shadow-base);
+  border: 1px solid var(--border-default);
+  animation: slideUp 0.3s ease;
+}
+
+.buy-ticket-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--r-spacing-md);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.buy-ticket-modal__title {
+  margin: 0;
+  font-size: var(--fs-lg);
+  color: var(--text-primary);
+}
+
+.buy-ticket-modal__close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: var(--fs-lg);
+  cursor: pointer;
+  padding: var(--r-spacing-xs);
+  line-height: 1;
+  border-radius: var(--r-radius);
+}
+
+.buy-ticket-modal__close:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.buy-ticket-modal__body {
+  padding: var(--r-spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-spacing-sm);
+}
+
+.buy-ticket-modal__text {
+  margin: 0;
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+  line-height: var(--lh-normal);
+}
+
+.buy-ticket-modal__concert {
+  margin: 0;
+  font-size: var(--fs-md);
+  color: var(--text-primary);
+}
+
+.buy-ticket-modal__label {
+  color: var(--text-secondary);
+}
+
+.buy-ticket-modal__price {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--accent-success);
+}
+
+.buy-ticket-modal__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-spacing-sm);
+  padding: var(--r-spacing-md);
+  border-top: 1px solid var(--border-default);
+}
+
+.buy-ticket-modal__primary {
+  background-color: var(--accent-primary);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--r-radius);
+  font-family: var(--font-family);
+  font-size: var(--fs-md);
+  min-height: 2.75rem;
+  cursor: pointer;
+  transition: background-color var(--tr);
+}
+
+.buy-ticket-modal__primary:hover {
+  filter: brightness(1.08);
+}
+
+.buy-ticket-modal__primary:focus-visible {
+  outline: 2px solid var(--accent-link);
+  outline-offset: 2px;
+}
+
+.buy-ticket-modal__secondary {
+  text-align: center;
+  text-decoration: none;
+}

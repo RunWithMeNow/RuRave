@@ -22,8 +22,8 @@ public static class TestDatabaseSeeder
         var moscow = cities[0];
         var spb = cities[1];
 
-        var circus = new Venue { CityId = moscow.Id, Name = "Циркус", Address = "Москва" };
-        var ermitage = new Venue { CityId = spb.Id, Name = "Эрмитаж", Address = "СПб" };
+        var circus = new Venue { CityId = moscow.Id, Name = "Циркус", Address = "Цветной бульвар, 13, Москва" };
+        var ermitage = new Venue { CityId = spb.Id, Name = "Эрмитаж", Address = "Дворцовая наб., 2, Санкт-Петербург" };
         db.Venues.AddRange(circus, ermitage);
         await db.SaveChangesAsync();
 
@@ -40,6 +40,7 @@ public static class TestDatabaseSeeder
             StartsAt = new DateTimeOffset(2026, 8, 30, 18, 0, 0, TimeSpan.FromHours(3)),
             VenueId = circus.Id,
             ImageUrl = "https://example.com/festival.jpg",
+            Description = "Ночной рейв-фестиваль с двумя хедлайнерами. Свет, бас и визуал на большой сцене.",
             Status = ConcertStatus.Published
         };
         var draft = new Concert
@@ -49,6 +50,7 @@ public static class TestDatabaseSeeder
             StartsAt = new DateTimeOffset(2026, 9, 1, 20, 0, 0, TimeSpan.FromHours(3)),
             VenueId = circus.Id,
             ImageUrl = "https://example.com/draft.jpg",
+            Description = "Черновик — не публикуется в афише.",
             Status = ConcertStatus.Draft
         };
         var noTickets = new Concert
@@ -58,6 +60,7 @@ public static class TestDatabaseSeeder
             StartsAt = new DateTimeOffset(2026, 9, 2, 20, 0, 0, TimeSpan.FromHours(3)),
             VenueId = circus.Id,
             ImageUrl = "https://example.com/no-tickets.jpg",
+            Description = "Концерт без активных категорий билетов.",
             Status = ConcertStatus.Published
         };
         var lidaShow = new Concert
@@ -67,6 +70,7 @@ public static class TestDatabaseSeeder
             StartsAt = new DateTimeOffset(2026, 7, 17, 19, 30, 0, TimeSpan.FromHours(3)),
             VenueId = ermitage.Id,
             ImageUrl = "https://example.com/lida.jpg",
+            Description = "Сольный концерт Lida в Санкт-Петербурге. Поддержка живого бэнд-сета.",
             Status = ConcertStatus.Published
         };
 

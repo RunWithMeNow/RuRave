@@ -97,7 +97,7 @@ dotnet ef migrations add <Name> --project src/RuRave.Infrastructure --startup-pr
 
 ## Тестовые данные (seed)
 
-`scripts/SeedTestData.sql` — очищает таблицы и вставляет демо-данные.
+`scripts/SeedTestData.sql` — T-SQL: table variables, `TRY/CATCH`, `DATETIMEOFFSET`; очищает таблицы и вставляет демо-данные. В SSMS выберите базу **RuRaveDB** (или раскомментируйте `USE [RuRaveDB]` в скрипте). Удобнее: `seed.ps1`.
 
 **Города:** Москва, Санкт-Петербург, Новосибирск (+ данные для тестов в seed).
 
@@ -109,7 +109,9 @@ cd scripts
 .\seed.ps1 -Server "YOUR_SERVER" -Database "RuRaveDB"
 ```
 
-Требуется `sqlcmd` (флаг `-C` для TrustServerCertificate).
+Требуется `sqlcmd` (флаги `-C`, для кириллицы скрипт сам задаёт UTF-8 через `-f i:65001`).
+
+**Кириллица в БД «кракозябрами»:** перезапустите seed через `.\seed.ps1` — не вызывайте `sqlcmd -i SeedTestData.sql` без кодовой страницы UTF-8. В SSMS открывайте `.sql` как UTF-8 with signature.
 
 ## Запуск API
 
@@ -179,6 +181,35 @@ JSON — **camelCase** (`id`, `imageUrl`, `startsAt`, `minPrice`, …).
 
 **Ошибки:** RFC 7807 Problem Details — **400** (нет/неверный `cityId`, `page`, `pageSize`), **404** (город не найден).
 
+### `GET /api/concerts/{id}`
+
+Один опубликованный концерт с активными категориями билетов (те же правила, что у списка).
+
+**Ответ 200:**
+
+```json
+{
+  "id": 1,
+  "imageUrl": "https://...",
+  "title": "DCOnTour",
+  "description": "Тур DK по клубам Москвы...",
+  "startsAt": "2026-12-12T20:00:00+03:00",
+  "place": "Циркус",
+  "venueAddress": "Цветной бульвар, 13, Москва",
+  "mapSearchQuery": "Москва, Цветной бульвар, 13, Москва",
+  "cityId": 1,
+  "cityName": "Москва",
+  "artists": ["DK"],
+  "artistDisplay": "DK",
+  "minPrice": 3000,
+  "ticketCategories": [
+    { "name": "Танцпол", "price": 3000, "sortOrder": 1 }
+  ]
+}
+```
+
+**Ошибки:** **404** (концерт не найден, черновик, отменён, нет активных билетов).
+
 ## CORS и фронтенд
 
 Разрешены origin Vite dev-сервера: `localhost` / `127.0.0.1` на портах **5173**, 5174, 4173.
@@ -193,11 +224,10 @@ JSON — **camelCase** (`id`, `imageUrl`, `startsAt`, `minPrice`, …).
 dotnet test
 ```
 
-12 тестов: read-сервисы + HTTP (`/api/cities`, `/api/concerts`). Используют SQL Server; сервер по умолчанию в `tests/RuRave.Tests/appsettings.test.json` (`TestConnection:Server`). На каждый прогон — отдельная БД `RuRave_Test_*` / `RuRave_ApiTest_*`.
+18+ тестов: read-сервисы + HTTP (`/api/cities`, `/api/concerts`, `/api/concerts/{id}`). Используют SQL Server; сервер по умолчанию в `tests/RuRave.Tests/appsettings.test.json` (`TestConnection:Server`). На каждый прогон — отдельная БД `RuRave_Test_*` / `RuRave_ApiTest_*`.
 
 ## Roadmap (вне MVP)
 
-- `GET /api/concerts/{id}` — страница «Подробнее»
 - Баннеры с API
 - Админка CRUD
 - Аутентификация и заказы
