@@ -1,4 +1,7 @@
 .search__wrapper {
+  /* Ширина поиска в неактивном состоянии (фокус / текст → 100% блока справа) */
+  --search-collapsed-width: 20rem;
+
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -19,7 +22,7 @@
   align-items: stretch;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .search__wrapper--row {
     flex-direction: column;
     align-items: stretch;
@@ -56,23 +59,52 @@
   .search__input {
     min-height: 2.75rem;
   }
+
+  .search__wrapper--row .date-filter + .search-artist__container {
+    margin-inline-start: 0;
+  }
+
+  .search__form {
+    width: 100%;
+    margin-inline-end: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search__form {
+    transition: none;
+  }
+}
+
+.search__wrapper--row .date-filter + .search-artist__container {
+  margin-inline-start: calc(-1 * (var(--r-spacing-md) - var(--r-spacing-xs)));
 }
 
 .search-artist__container {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   flex: 1;
   min-width: 0;
-  width: 100%;
 }
 
 .search__form {
   display: flex;
   align-items: center;
   margin: 0;
+  margin-inline-end: auto;
   font-family: var(--font-family);
+  width: var(--search-collapsed-width);
+  max-width: 100%;
+  flex-shrink: 0;
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: left center;
+}
+
+.search__form:focus-within,
+.search__form:has(.search__input:not(:placeholder-shown)) {
   width: 100%;
+  max-width: 100%;
 }
 
 .search__container {

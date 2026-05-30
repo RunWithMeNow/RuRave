@@ -1,11 +1,10 @@
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { handleAboutNavClick, handleAfishaNavClick } from '../../utils/homeNavScroll.js';
 import './Footer.css';
 import '../../App.css';
 
-const navLinkClassName = ({ isActive }) =>
-    `footer__link${isActive ? ' footer__link--active' : ''}`;
-
 const Footer = () => {
+    const location = useLocation();
     const year = new Date().getFullYear();
 
     return (
@@ -20,15 +19,20 @@ const Footer = () => {
                 </div>
 
                 <nav className="footer__nav" aria-label="Навигация в подвале">
-                    <NavLink to="/" end className={navLinkClassName}>
+                    <Link
+                        to="/#afisha"
+                        className="footer__link"
+                        onClick={(event) => handleAfishaNavClick(event, location.pathname)}
+                    >
                         Афиша
-                    </NavLink>
-                    <NavLink to="/about" className={navLinkClassName}>
+                    </Link>
+                    <Link
+                        to="/#about"
+                        className={`footer__link${location.hash === '#about' ? ' footer__link--active' : ''}`}
+                        onClick={(event) => handleAboutNavClick(event, location.pathname)}
+                    >
                         О проекте
-                    </NavLink>
-                    <NavLink to="/profile" className={navLinkClassName}>
-                        Профиль
-                    </NavLink>
+                    </Link>
                 </nav>
 
                 <div className="footer__bottom">

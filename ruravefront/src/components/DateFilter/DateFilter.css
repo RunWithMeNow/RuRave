@@ -66,7 +66,7 @@
   width: min(100% - 2rem, 24rem);
   padding: var(--r-spacing-md);
   background-color: var(--bg-surface);
-  border: 1px solid var(--accent-primary);
+  border: none;
   border-radius: var(--r-radius);
   box-shadow: var(--shadow-base);
   animation: date-filter-slide-up 0.3s ease;
@@ -90,8 +90,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
   padding: 0;
   font-size: 1.25rem;
   color: var(--text-secondary);
@@ -178,9 +180,9 @@
   box-shadow: var(--shadow-hover);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .date-filter__label {
-    max-width: 8rem;
+    max-width: none;
   }
 }
 

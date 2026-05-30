@@ -9,8 +9,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--r-spacing-lg);
-  padding-block: 2rem 2.5rem;
-  padding-inline: var(--r-spacing-lg);
+  padding-block: 2rem calc(2.5rem + var(--safe-area-bottom));
+  padding-inline-start: max(var(--r-spacing-lg), var(--safe-area-left));
+  padding-inline-end: max(var(--r-spacing-lg), var(--safe-area-right));
 }
 
 .footer__top {

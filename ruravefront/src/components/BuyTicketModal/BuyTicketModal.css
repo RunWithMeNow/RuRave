@@ -17,7 +17,7 @@
   width: 100%;
   max-width: 28rem;
   box-shadow: var(--shadow-base);
-  border: 1px solid var(--border-default);
+  border: none;
   animation: slideUp 0.3s ease;
 }
 
@@ -26,7 +26,7 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--r-spacing-md);
-  border-bottom: 1px solid var(--border-default);
+  border: none;
 }
 
 .buy-ticket-modal__title {
@@ -36,6 +36,11 @@
 }
 
 .buy-ticket-modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   background: none;
   border: none;
   color: var(--text-secondary);
@@ -87,7 +92,7 @@
   flex-direction: column;
   gap: var(--r-spacing-sm);
   padding: var(--r-spacing-md);
-  border-top: 1px solid var(--border-default);
+  border: none;
 }
 
 .buy-ticket-modal__primary {
@@ -114,4 +119,18 @@
 .buy-ticket-modal__secondary {
   text-align: center;
   text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .buy-ticket-modal__overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .buy-ticket-modal {
+    max-height: calc(94vh - var(--safe-area-bottom));
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    padding-bottom: var(--safe-area-bottom);
+  }
 }

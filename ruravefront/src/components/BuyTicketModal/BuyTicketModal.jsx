@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { lockBodyScroll, unlockBodyScroll } from '../../utils/scrollLock.js';
 import './BuyTicketModal.css';
 import '../../App.css';
 
@@ -11,8 +12,7 @@ const BuyTicketModal = ({ isOpen, onClose, concertTitle, minPrice }) => {
             return undefined;
         }
 
-        const previousOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
+        lockBodyScroll();
         closeButtonRef.current?.focus();
 
         const handleKeyDown = (event) => {
@@ -24,7 +24,7 @@ const BuyTicketModal = ({ isOpen, onClose, concertTitle, minPrice }) => {
         document.addEventListener('keydown', handleKeyDown);
 
         return () => {
-            document.body.style.overflow = previousOverflow;
+            unlockBodyScroll();
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, [isOpen, onClose]);

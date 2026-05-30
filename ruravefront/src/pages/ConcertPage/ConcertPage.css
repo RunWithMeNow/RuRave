@@ -1,38 +1,107 @@
-.concert-page {
-  background-color: var(--bg-page);
-  min-height: calc(100vh - var(--header-height));
-  padding: var(--r-spacing-lg) 0 var(--r-spacing-xl);
+.concert-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background-color: var(--overlay-bg);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--r-spacing-md);
+  animation: concert-modal-fade-in 0.2s ease;
 }
 
-.concert-page__inner {
+.concert-modal {
+  width: 100%;
+  max-width: 40rem;
+  max-height: min(92vh, 52rem);
   display: flex;
   flex-direction: column;
-  gap: var(--r-spacing-md);
+  background-color: var(--bg-surface);
+  border: none;
+  border-radius: var(--r-radius);
+  box-shadow: var(--shadow-base);
+  animation: concert-modal-slide-up 0.3s ease;
+  overflow: hidden;
 }
 
-.concert-page__back {
-  align-self: flex-start;
-  text-decoration: none;
+.concert-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--r-spacing-sm);
+  flex-shrink: 0;
+  padding: var(--r-spacing-md);
+  border: none;
+}
+
+.concert-modal__heading {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: var(--lh-tight);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.concert-modal__close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: var(--fs-lg);
+  cursor: pointer;
+  padding: var(--r-spacing-xs);
+  line-height: 1;
+  border-radius: var(--r-radius);
+}
+
+.concert-modal__close:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.concert-modal__body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .concert-page__article {
-  background-color: var(--bg-surface);
-  border-radius: var(--r-radius);
-  box-shadow: var(--shadow-base);
   overflow: hidden;
+}
+
+.concert-page__hero-media {
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  max-height: 12rem;
+  background-color: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.concert-page__hero-media--placeholder {
+  background-color: var(--bg-surface);
 }
 
 .concert-page__hero {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 100%;
   object-fit: cover;
   display: block;
-  background-color: var(--bg-elevated);
+  background-color: var(--bg-surface);
 }
 
-.concert-page__hero--fallback {
+.concert-page__hero--placeholder {
+  width: auto;
+  height: auto;
+  max-width: 62%;
+  max-height: 72%;
   object-fit: contain;
-  padding: var(--r-spacing-lg);
+  padding: var(--r-spacing-sm);
 }
 
 .concert-page__body {
@@ -206,6 +275,18 @@
 }
 
 @media (max-width: 768px) {
+  .concert-modal__overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .concert-modal {
+    max-height: calc(94vh - var(--safe-area-bottom));
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    padding-bottom: var(--safe-area-bottom);
+  }
+
   .concert-page__footer {
     flex-direction: column;
     align-items: stretch;
@@ -213,5 +294,25 @@
 
   .concert-page__buy {
     width: 100%;
+  }
+}
+
+@keyframes concert-modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes concert-modal-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import AboutSection from '../../components/AboutSection/AboutSection.jsx';
 import EventList from '../../components/EventList/EventList.jsx';
 import EventCardSkeletonList from '../../components/EventCardSkeleton/EventCardSkeletonList.jsx';
 import LoadMoreButton from '../../components/LoadMoreButton/LoadMoreButton.jsx';
@@ -14,6 +16,7 @@ import {
     intersectMonthWithRange,
     normalizeDateRange,
 } from '../../utils/dateRange.js';
+import { scrollToAboutSection, scrollToAfishaSection } from '../../utils/homeNavScroll.js';
 import bannerHero from '../../assets/images/banner-hero.png';
 import './HomePage.css';
 import '../../App.css';
@@ -33,6 +36,8 @@ const shuffleConcerts = (items) => {
 };
 
 const HomePage = () => {
+    const location = useLocation();
+
     const [cities, setCities] = useState([]);
     const [citiesLoading, setCitiesLoading] = useState(true);
     const [citiesError, setCitiesError] = useState(null);
@@ -207,6 +212,14 @@ const HomePage = () => {
     useEffect(() => {
         loadCities();
     }, [loadCities]);
+
+    useEffect(() => {
+        if (location.hash === '#about') {
+            scrollToAboutSection();
+        } else if (location.hash === '#afisha') {
+            scrollToAfishaSection();
+        }
+    }, [location.hash]);
 
     useEffect(() => {
         if (selectedCityId) {
@@ -395,7 +408,11 @@ const HomePage = () => {
                 imageUrl={bannerHero}
                 alt="Концерт: толпа в зале, яркий свет сцены — RuRave"
             />
-            <div className="home__content layout-container section-spacing">
+            <div
+                id="afisha"
+                className="home__content"
+                aria-label="Афиша концертов"
+            >
                 <Search
                     key={selectedCityId ?? 'no-city'}
                     searchTerm={searchTerm}
@@ -539,6 +556,7 @@ const HomePage = () => {
                     </section>
                 )}
             </div>
+            <AboutSection />
         </div>
     );
 };

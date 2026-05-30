@@ -1,4 +1,6 @@
 .venue-map {
+  --venue-map-height: clamp(22rem, 48vh, 28rem);
+
   display: flex;
   flex-direction: column;
   gap: var(--r-spacing-sm);
@@ -11,7 +13,7 @@
 }
 
 .venue-map__panel {
-  min-height: 280px;
+  min-height: var(--venue-map-height);
   border-radius: var(--r-radius);
   border: 1px solid var(--border-default);
   background-color: var(--bg-surface);
@@ -58,10 +60,13 @@
   border-radius: var(--r-radius);
   border: 1px solid var(--border-default);
   overflow: hidden;
+  min-height: var(--venue-map-height);
+  height: var(--venue-map-height);
 }
 
 .venue-map__map {
-  min-height: 280px;
+  min-height: var(--venue-map-height);
+  height: var(--venue-map-height);
   width: 100%;
   z-index: 0;
 }

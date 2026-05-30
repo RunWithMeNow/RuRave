@@ -1,18 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { useTheme } from '../../context/ThemeContext.jsx';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { handleAboutNavClick, handleAfishaNavClick } from '../../utils/homeNavScroll.js';
+import { lockBodyScroll, unlockBodyScroll } from '../../utils/scrollLock.js';
 import './Header.css';
 import '../../App.css';
 
-const navLinkClassName = ({ isActive }) =>
-    `header__page-link${isActive ? ' header__page-link--active' : ''}`;
-
-const SCROLL_THRESHOLD = 12;
-
 const Header = () => {
-    const { toggleTheme, isDark } = useTheme();
+    const location = useLocation();
     const [menuOpen, setMenuOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
 
     const closeMenu = useCallback(() => {
         setMenuOpen(false);
@@ -23,22 +18,11 @@ const Header = () => {
     };
 
     useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > SCROLL_THRESHOLD);
-        };
-
-        handleScroll();
-        window.addEventListener('scroll', handleScroll, { passive: true });
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
-
-    useEffect(() => {
         if (!menuOpen) {
             return undefined;
         }
+
+        lockBodyScroll();
 
         const handleKeyDown = (event) => {
             if (event.key === 'Escape') {
@@ -50,24 +34,31 @@ const Header = () => {
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
+            unlockBodyScroll();
         };
     }, [menuOpen, closeMenu]);
 
     const navLinks = (onNavigate = undefined) => (
         <>
-            <NavLink to="/" end className={navLinkClassName} onClick={onNavigate}>
+            <Link
+                to="/#afisha"
+                className="header__page-link"
+                onClick={(event) => handleAfishaNavClick(event, location.pathname, onNavigate)}
+            >
                 <span className="header__page-text">Афиша</span>
-            </NavLink>
-            <NavLink to="/about" className={navLinkClassName} onClick={onNavigate}>
+            </Link>
+            <Link
+                to="/#about"
+                className={`header__page-link${location.hash === '#about' ? ' header__page-link--active' : ''}`}
+                onClick={(event) => handleAboutNavClick(event, location.pathname, onNavigate)}
+            >
                 <span className="header__page-text">О проекте</span>
-            </NavLink>
+            </Link>
         </>
     );
 
     return (
-        <header
-            className={`header__container${scrolled ? ' header__container--scrolled' : ''}`}
-        >
+        <header className="header__container">
             <NavLink to="/" end className="header__brand" aria-label="RuRave — на главную">
                 <img className="header__logo" src="/src/assets/icons/logo.png" alt="" />
                 <span className="header__brand-title">
@@ -94,22 +85,6 @@ const Header = () => {
                 >
                     <span aria-hidden="true">☰</span>
                 </button>
-
-                <div className="header__lk-container">
-                    <button
-                        type="button"
-                        className="header__theme-toggle"
-                        onClick={toggleTheme}
-                        aria-label={isDark ? 'Включить светлую тему' : 'Включить тёмную тему'}
-                        aria-pressed={!isDark}
-                        title={isDark ? 'Светлая тема' : 'Тёмная тема'}
-                    >
-                        <span aria-hidden="true">{isDark ? '☀️' : '🌙'}</span>
-                    </button>
-                    <NavLink to="/profile" className={navLinkClassName}>
-                        <span className="header__page-text">Профиль</span>
-                    </NavLink>
-                </div>
             </div>
 
             {menuOpen && (
