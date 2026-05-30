@@ -7,8 +7,11 @@ import 'dayjs/locale/ru';
 import { useTheme } from '../../context/ThemeContext.jsx';
 import { createRuRaveMuiTheme } from '../../theme/muiDateTheme.js';
 import {
+    formatDateFilterLabel,
     formatDateRangeLabel,
-    getDefaultDateRange,
+    formatSingleDateLabel,
+    getWidgetDefaultRange,
+    isSingleDayRange,
     normalizeDateRange,
     parseIsoDate,
 } from '../../utils/dateRange.js';
@@ -29,6 +32,7 @@ const DateFilter = ({
     dateFrom,
     dateTo,
     onRangeChange,
+    onDefaultsReset,
     concertDates = [],
     onMonthChange,
     disabled = false,
@@ -41,7 +45,7 @@ const DateFilter = ({
         [dateFrom, dateTo]
     );
 
-    const defaultRange = useMemo(() => getDefaultDateRange(), []);
+    const widgetDefaultRange = useMemo(() => getWidgetDefaultRange(), []);
 
     const [isOpen, setIsOpen] = useState(false);
     const initialPending = syncPendingFromRange(appliedRange.from, appliedRange.to);
@@ -119,18 +123,19 @@ const DateFilter = ({
     };
 
     const handleApply = () => {
-        if (pendingStart && pendingEnd) {
-            onRangeChange?.({
-                from: pendingStart.format('YYYY-MM-DD'),
-                to: pendingEnd.format('YYYY-MM-DD'),
-            });
-            closeModal();
+        if (!pendingStart) {
+            return;
         }
+
+        const from = pendingStart.format('YYYY-MM-DD');
+        const to = (pendingEnd ?? pendingStart).format('YYYY-MM-DD');
+        onRangeChange?.({ from, to });
+        closeModal();
     };
 
     const handleReset = () => {
-        resetPendingToRange(defaultRange.from, defaultRange.to);
-        onRangeChange?.(defaultRange);
+        resetPendingToRange(widgetDefaultRange.from, widgetDefaultRange.to);
+        onDefaultsReset?.();
         focusCalendarOnToday();
     };
 
@@ -139,27 +144,28 @@ const DateFilter = ({
         onMonthChange?.(month.year(), month.month());
     };
 
-    const canApply = Boolean(pendingStart && pendingEnd);
-    const triggerLabel = formatDateRangeLabel(appliedRange.from, appliedRange.to);
-    const calendarValue = pendingEnd ?? pendingStart ?? calendarMonth;
+    const canApply = Boolean(pendingStart);
+    const appliedFrom = appliedRange.from;
+    const appliedTo = appliedRange.to;
+    const triggerLabel = formatDateFilterLabel(appliedFrom, appliedTo);
     const concertDateSet = useMemo(() => new Set(concertDates), [concertDates]);
 
-    const pendingRangeLabel =
-        pendingStart && pendingEnd
-            ? formatDateRangeLabel(
-                  pendingStart.format('YYYY-MM-DD'),
-                  pendingEnd.format('YYYY-MM-DD')
-              )
-            : pendingStart
-              ? `${pendingStart.format('DD.MM.YYYY')} — …`
-              : null;
+    const pendingFromIso = pendingStart?.format('YYYY-MM-DD');
+    const pendingToIso = (pendingEnd ?? pendingStart)?.format('YYYY-MM-DD');
+
+    const pendingSelectionLabel = pendingStart
+        ? formatDateFilterLabel(pendingFromIso, pendingToIso)
+        : formatSingleDateLabel();
 
     const instructionText = (() => {
         if (pendingStart && pendingEnd && !awaitingEnd) {
-            return `Выбран период: ${pendingRangeLabel}. Нажмите день, чтобы выбрать новое начало`;
+            const selectionHint = isSingleDayRange(pendingFromIso, pendingToIso)
+                ? `Выбран день: ${pendingSelectionLabel}. Нажмите день, чтобы выбрать другую дату`
+                : `Выбран период: ${pendingSelectionLabel}. Нажмите день, чтобы выбрать новое начало`;
+            return selectionHint;
         }
         if (awaitingEnd && pendingStart) {
-            return `Начало: ${pendingStart.format('DD.MM.YYYY')}. Выберите дату окончания`;
+            return `Начало: ${formatSingleDateLabel(pendingFromIso)}. Выберите дату окончания или нажмите «Применить» для одного дня`;
         }
         return 'Выберите дату начала периода';
     })();
@@ -227,7 +233,15 @@ const DateFilter = ({
                     src="/src/assets/icons/date.png"
                     alt=""
                 />
-                <span className="date-filter__label">{triggerLabel}</span>
+                <span className="date-filter__label">
+                    {isSingleDayRange(appliedFrom, appliedTo) ? (
+                        <time dateTime={appliedFrom || appliedTo}>{triggerLabel}</time>
+                    ) : (
+                        <span>
+                            {formatDateRangeLabel(appliedFrom, appliedTo)}
+                        </span>
+                    )}
+                </span>
                 <span className={`date-filter__arrow ${isOpen ? 'open' : ''}`} aria-hidden="true">
                     ▼
                 </span>
@@ -265,9 +279,8 @@ const DateFilter = ({
 
                                 <div className="date-filter__mui">
                                     <DateCalendar
-                                        key={calendarMonth.format('YYYY-MM')}
                                         referenceDate={calendarMonth}
-                                        value={calendarValue}
+                                        value={null}
                                         onChange={handleDaySelect}
                                         onMonthChange={handleMonthChange}
                                         slotProps={{ day: daySlotProps }}
@@ -275,7 +288,8 @@ const DateFilter = ({
                                 </div>
 
                                 <p className="date-filter__hint">
-                                    По умолчанию: сегодня — +1 год. Точки — дни с концертами
+                                    «По умолчанию»: в календаре — сегодня, афиша — на год вперёд. Точки — дни с
+                                    концертами
                                 </p>
 
                                 <div className="date-filter__actions">

@@ -6,12 +6,12 @@ import HomeMessage from '../../components/HomeMessage/HomeMessage.jsx';
 import Search from '../../components/Search/Search.jsx';
 import Banner from '../../components/Banner/Banner.jsx';
 import { getCities, getConcertDates, getConcerts, mapConcertToEventCard } from '../../api/client.js';
+import { applyConcertFilters, collectConcertDates } from '../../utils/concertFilters.js';
 import {
     CONCERTS_PAGE_SIZE,
-    concertDayKey,
-    getDefaultDateRange,
-    getMonthBounds,
-    isConcertInDateRange,
+    getAfishaDefaultRange,
+    getWidgetDefaultRange,
+    intersectMonthWithRange,
     normalizeDateRange,
 } from '../../utils/dateRange.js';
 import bannerHero from '../../assets/images/banner-hero.png';
@@ -21,28 +21,6 @@ import '../../App.css';
 const pickDefaultCity = (cities) => {
     const moscow = cities.find((c) => c.slug === 'moskva');
     return moscow ?? cities[0] ?? null;
-};
-
-const filterConcertsBySearch = (items, term) => {
-    const query = term.trim().toLowerCase();
-    if (!query) {
-        return items;
-    }
-    return items.filter(
-        (concert) =>
-            concert.title?.toLowerCase().includes(query) ||
-            concert.artist?.toLowerCase().includes(query) ||
-            concert.place?.toLowerCase().includes(query)
-    );
-};
-
-const filterConcertsByDateRange = (items, range) => {
-    if (!range?.from || !range?.to) {
-        return items;
-    }
-    return items.filter((concert) =>
-        isConcertInDateRange(concert.startsAt, range.from, range.to)
-    );
 };
 
 const shuffleConcerts = (items) => {
@@ -60,7 +38,8 @@ const HomePage = () => {
     const [citiesError, setCitiesError] = useState(null);
 
     const [selectedCityId, setSelectedCityId] = useState(null);
-    const [dateRange, setDateRange] = useState(getDefaultDateRange);
+    const [dateRange, setDateRange] = useState(getAfishaDefaultRange);
+    const [widgetDateRange, setWidgetDateRange] = useState(getWidgetDefaultRange);
     const [concertDates, setConcertDates] = useState([]);
 
     const [concerts, setConcerts] = useState([]);
@@ -108,12 +87,12 @@ const HomePage = () => {
             }
 
             const mapped = result.items.map(mapConcertToEventCard);
-            const filtered = filterConcertsByDateRange(mapped, range);
-            const apiIgnoredDates =
+            const filtered = applyConcertFilters(mapped, { search, range });
+            const apiIgnoredFilters =
                 !append && mapped.length > 0 && filtered.length < mapped.length;
 
             setConcerts((prev) => (append ? [...prev, ...filtered] : filtered));
-            setTotalCount(apiIgnoredDates ? filtered.length : result.totalCount);
+            setTotalCount(apiIgnoredFilters ? filtered.length : result.totalCount);
             setConcertsPage(page);
         } catch (err) {
             if (!append && loadId === concertsLoadIdRef.current) {
@@ -130,7 +109,7 @@ const HomePage = () => {
         }
     }, []);
 
-    const loadAllConcertsRandom = useCallback(async (cityList, range) => {
+    const loadAllConcertsRandom = useCallback(async (cityList, range, search) => {
         if (cityList.length === 0 || !range?.from || !range?.to) {
             setAllConcertsRandom([]);
             return;
@@ -144,6 +123,7 @@ const HomePage = () => {
                 cityList.map((city) =>
                     getConcerts({
                         cityId: city.id,
+                        search: search?.trim() || undefined,
                         dateFrom: range.from,
                         dateTo: range.to,
                         pageSize: 100,
@@ -161,7 +141,7 @@ const HomePage = () => {
                     byId.set(concert.id, mapConcertToEventCard(concert));
                 });
             });
-            const merged = filterConcertsByDateRange([...byId.values()], range);
+            const merged = applyConcertFilters([...byId.values()], { search, range });
             setAllConcertsRandom(shuffleConcerts(merged));
             setAllConcertsVisibleCount(CONCERTS_PAGE_SIZE);
         } catch {
@@ -177,19 +157,23 @@ const HomePage = () => {
     }, []);
 
     const loadConcertDatesForMonth = useCallback(
-        async (cityId, year, monthIndex, search) => {
+        async (cityId, year, monthIndex, search, range) => {
             if (!cityId) {
                 return;
             }
 
-            const { from, to } = getMonthBounds(year, monthIndex);
+            const bounds = intersectMonthWithRange(year, monthIndex, range);
+            if (!bounds) {
+                setConcertDates([]);
+                return;
+            }
 
             try {
                 const result = await getConcertDates({
                     cityId,
-                    from,
-                    to,
-                    search: search || undefined,
+                    from: bounds.from,
+                    to: bounds.to,
+                    search: search?.trim() || undefined,
                 });
                 setConcertDates(result.dates ?? []);
             } catch {
@@ -238,12 +222,13 @@ const HomePage = () => {
         if (citiesLoading || citiesError || cities.length === 0 || selectedCityId) {
             return;
         }
-        loadAllConcertsRandom(cities, dateRange);
+        loadAllConcertsRandom(cities, dateRange, searchTerm);
     }, [
         cities,
         citiesLoading,
         citiesError,
         selectedCityId,
+        searchTerm,
         dateRange.from,
         dateRange.to,
         loadAllConcertsRandom,
@@ -254,23 +239,45 @@ const HomePage = () => {
             return;
         }
         const now = new Date();
-        loadConcertDatesForMonth(selectedCityId, now.getFullYear(), now.getMonth(), searchTerm);
-    }, [selectedCityId, searchTerm, loadConcertDatesForMonth]);
+        loadConcertDatesForMonth(
+            selectedCityId,
+            now.getFullYear(),
+            now.getMonth(),
+            searchTerm,
+            dateRange
+        );
+    }, [
+        selectedCityId,
+        searchTerm,
+        dateRange.from,
+        dateRange.to,
+        loadConcertDatesForMonth,
+    ]);
 
     useEffect(() => {
         setAllConcertsVisibleCount(CONCERTS_PAGE_SIZE);
     }, [searchTerm, dateRange.from, dateRange.to]);
 
+    const applyDateFilterDefaults = useCallback(() => {
+        concertsLoadIdRef.current += 1;
+        allConcertsLoadIdRef.current += 1;
+        setDateRange(getAfishaDefaultRange());
+        setWidgetDateRange(getWidgetDefaultRange());
+    }, []);
+
     const handleCityChange = (city) => {
         setSelectedCityId(city.id);
         setSearchTerm('');
-        setDateRange(getDefaultDateRange());
+        applyDateFilterDefaults();
+        setConcerts([]);
+        setTotalCount(0);
+        setConcertsPage(1);
     };
 
     const handleCityReset = () => {
         setSelectedCityId(null);
         setSearchTerm('');
-        setDateRange(getDefaultDateRange());
+        applyDateFilterDefaults();
         setConcerts([]);
         setTotalCount(0);
         setConcertsPage(1);
@@ -283,14 +290,22 @@ const HomePage = () => {
     };
 
     const handleDateRangeChange = (range) => {
+        const next = normalizeDateRange(range);
         concertsLoadIdRef.current += 1;
         allConcertsLoadIdRef.current += 1;
-        setDateRange(normalizeDateRange(range));
+        setDateRange(next);
+        setWidgetDateRange(next);
     };
 
     const handleCalendarMonthChange = (year, monthIndex) => {
         if (selectedCityId) {
-            loadConcertDatesForMonth(selectedCityId, year, monthIndex, searchTerm);
+            loadConcertDatesForMonth(
+                selectedCityId,
+                year,
+                monthIndex,
+                searchTerm,
+                dateRange
+            );
         }
     };
 
@@ -320,23 +335,23 @@ const HomePage = () => {
         if (selectedCityId) {
             return concertDates;
         }
-        const dates = new Set();
-        allConcertsRandom.forEach((concert) => {
-            const key = concertDayKey(concert.startsAt);
-            if (key) {
-                dates.add(key);
-            }
-        });
-        return [...dates];
+        return collectConcertDates(allConcertsRandom);
     }, [selectedCityId, concertDates, allConcertsRandom]);
 
-    const filteredAllConcerts = useMemo(() => {
-        const bySearch = filterConcertsBySearch(allConcertsRandom, searchTerm);
-        return filterConcertsByDateRange(bySearch, dateRange);
-    }, [allConcertsRandom, searchTerm, dateRange.from, dateRange.to]);
+    const filteredAllConcerts = allConcertsRandom;
 
     const visibleAllConcerts = filteredAllConcerts.slice(0, allConcertsVisibleCount);
     const hasMoreAllConcerts = allConcertsVisibleCount < filteredAllConcerts.length;
+
+    const concertsInitialLoading = concertsLoading && concerts.length === 0;
+    const concertsRefreshing = concertsLoading && concerts.length > 0;
+    const allConcertsInitialLoading = allConcertsLoading && filteredAllConcerts.length === 0;
+    const allConcertsRefreshing = allConcertsLoading && filteredAllConcerts.length > 0;
+
+    const showCityConcertsList =
+        selectedCityId &&
+        !concertsError &&
+        (concerts.length > 0 || concertsRefreshing);
 
     const showNoResults =
         !concertsLoading &&
@@ -383,15 +398,17 @@ const HomePage = () => {
             <div className="home__content layout-container section-spacing">
                 <Search
                     key={selectedCityId ?? 'no-city'}
+                    searchTerm={searchTerm}
                     onSearch={handleSearch}
                     cities={cities}
                     citiesLoading={citiesLoading}
                     selectedCityId={selectedCityId}
                     onCityChange={handleCityChange}
                     onCityReset={handleCityReset}
-                    dateFrom={dateRange.from}
-                    dateTo={dateRange.to}
+                    dateFrom={widgetDateRange.from}
+                    dateTo={widgetDateRange.to}
                     onDateRangeChange={handleDateRangeChange}
+                    onDateFilterDefaults={applyDateFilterDefaults}
                     concertDates={calendarConcertDates}
                     onCalendarMonthChange={handleCalendarMonthChange}
                 />
@@ -425,7 +442,7 @@ const HomePage = () => {
                     />
                 )}
 
-                {concertsLoading && selectedCityId && !citiesError && (
+                {concertsInitialLoading && selectedCityId && !citiesError && (
                     <section
                         className="home__concerts"
                         aria-busy="true"
@@ -444,11 +461,12 @@ const HomePage = () => {
                     />
                 )}
 
-                {!concertsLoading && !concertsError && selectedCityId && totalCount > 0 && (
+                {showCityConcertsList && (
                     <section
-                        key={`concerts-${selectedCityId}-${searchTerm}-${dateRange.from}-${dateRange.to}`}
-                        className="home__concerts home__concerts--enter"
+                        key={`concerts-city-${selectedCityId}`}
+                        className={`home__concerts home__concerts--enter${concertsRefreshing ? ' home__concerts--refreshing' : ''}`}
                         aria-labelledby="home-concerts-heading"
+                        aria-busy={concertsRefreshing}
                     >
                         <header className="home__concerts-header">
                             <h2 id="home-concerts-heading" className="home__concerts-title">
@@ -491,8 +509,7 @@ const HomePage = () => {
 
                 {showRandomAllConcerts && (
                     <section
-                        key={`all-${dateRange.from}-${dateRange.to}-${searchTerm}`}
-                        className="home__all-concerts home__concerts--enter"
+                        className={`home__all-concerts home__concerts--enter${allConcertsRefreshing ? ' home__concerts--refreshing' : ''}`}
                         aria-labelledby="home-all-concerts-heading"
                         aria-busy={allConcertsLoading}
                     >
@@ -500,14 +517,14 @@ const HomePage = () => {
                             <h2 id="home-all-concerts-heading" className="home__concerts-title">
                                 {searchTerm.trim() ? 'Результаты поиска' : 'Все концерты'}
                             </h2>
-                            {!allConcertsLoading && filteredAllConcerts.length > 0 && (
+                            {!allConcertsInitialLoading && filteredAllConcerts.length > 0 && (
                                 <p className="home__concerts-count">
                                     Показано {Math.min(allConcertsVisibleCount, filteredAllConcerts.length)} из{' '}
                                     {filteredAllConcerts.length}
                                 </p>
                             )}
                         </header>
-                        {allConcertsLoading ? (
+                        {allConcertsInitialLoading ? (
                             <EventCardSkeletonList />
                         ) : (
                             <>

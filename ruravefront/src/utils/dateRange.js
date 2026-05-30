@@ -12,7 +12,16 @@ export const parseIsoDate = (iso) => {
     return new Date(year, month - 1, day);
 };
 
-export const getDefaultDateRange = () => {
+/** Подпись виджета по умолчанию: только сегодня. */
+export const getWidgetDefaultRange = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const iso = toIsoDate(today);
+    return { from: iso, to: iso };
+};
+
+/** Фильтр афиши по умолчанию: сегодня — +1 год. */
+export const getAfishaDefaultRange = () => {
     const from = new Date();
     from.setHours(0, 0, 0, 0);
     const to = new Date(from);
@@ -20,27 +29,71 @@ export const getDefaultDateRange = () => {
     return { from: toIsoDate(from), to: toIsoDate(to) };
 };
 
-/** Нормализует диапазон: пустые значения заменяются дефолтом. */
+/** @deprecated Используйте getAfishaDefaultRange или getWidgetDefaultRange */
+export const getDefaultDateRange = getAfishaDefaultRange;
+
+export const isSingleDayRange = (fromIso, toIso) =>
+    !fromIso || !toIso || fromIso === toIso;
+
+/** Нормализует выбранный в календаре диапазон (пустые границы → сегодня). */
 export const normalizeDateRange = (range) => {
-    const defaults = getDefaultDateRange();
-    if (!range?.from || !range?.to) {
-        return defaults;
+    const { from: today, to: todayEnd } = getWidgetDefaultRange();
+    if (!range?.from && !range?.to) {
+        return { from: today, to: todayEnd };
     }
-    return { from: range.from, to: range.to };
+    return {
+        from: range.from || today,
+        to: range.to || range.from || todayEnd,
+    };
+};
+
+const dateLabelFormatter = new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+});
+
+export const formatSingleDateLabel = (iso) => {
+    if (!iso) {
+        return dateLabelFormatter.format(new Date());
+    }
+    return dateLabelFormatter.format(parseIsoDate(iso));
 };
 
 export const formatDateRangeLabel = (fromIso, toIso) => {
-    if (!fromIso || !toIso) {
-        return 'Период';
+    const rangeFmt = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short' });
+    return `${rangeFmt.format(parseIsoDate(fromIso))} — ${rangeFmt.format(parseIsoDate(toIso))}`;
+};
+
+/** Подпись на кнопке: одна дата или диапазон. */
+export const formatDateFilterLabel = (fromIso, toIso) => {
+    if (isSingleDayRange(fromIso, toIso)) {
+        return formatSingleDateLabel(fromIso || toIso);
     }
-    const fmt = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short' });
-    return `${fmt.format(parseIsoDate(fromIso))} — ${fmt.format(parseIsoDate(toIso))}`;
+    return formatDateRangeLabel(fromIso, toIso);
 };
 
 export const getMonthBounds = (year, monthIndex) => {
     const from = new Date(year, monthIndex, 1);
     const to = new Date(year, monthIndex + 1, 0);
     return { from: toIsoDate(from), to: toIsoDate(to) };
+};
+
+/** Пересечение видимого месяца календаря с применённым периодом афиши. */
+export const intersectMonthWithRange = (year, monthIndex, range) => {
+    const month = getMonthBounds(year, monthIndex);
+    if (!range?.from || !range?.to) {
+        return month;
+    }
+
+    const from = month.from > range.from ? month.from : range.from;
+    const to = month.to < range.to ? month.to : range.to;
+
+    if (from > to) {
+        return null;
+    }
+
+    return { from, to };
 };
 
 export const concertDayKey = (startsAtIso) => {

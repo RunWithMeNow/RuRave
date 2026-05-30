@@ -7,6 +7,7 @@ import '../../App.css';
 const DEBOUNCE_MS = 400;
 
 const Search = ({
+    searchTerm = '',
     onSearch,
     cities = [],
     citiesLoading = false,
@@ -16,13 +17,18 @@ const Search = ({
     dateFrom,
     dateTo,
     onDateRangeChange,
+    onDateFilterDefaults,
     concertDates = [],
     onCalendarMonthChange,
 }) => {
-    const [localSearchTerm, setLocalSearchTerm] = useState('');
+    const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
     const debounceTimerRef = useRef(null);
 
     const isDisabled = citiesLoading;
+
+    useEffect(() => {
+        setLocalSearchTerm(searchTerm);
+    }, [searchTerm]);
 
     useEffect(() => {
         if (isDisabled) {
@@ -61,6 +67,7 @@ const Search = ({
                 dateFrom={dateFrom}
                 dateTo={dateTo}
                 onRangeChange={onDateRangeChange}
+                onDefaultsReset={onDateFilterDefaults}
                 concertDates={concertDates}
                 onMonthChange={onCalendarMonthChange}
                 disabled={citiesLoading}

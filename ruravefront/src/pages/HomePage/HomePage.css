@@ -50,6 +50,18 @@
   margin-top: var(--r-spacing-lg);
 }
 
+.home__concerts--refreshing {
+  opacity: 0.65;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home__concerts--refreshing {
+    transition: none;
+  }
+}
+
 .home__concerts-load-more {
   margin-top: var(--r-spacing-md);
   animation: home-concerts-header-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
