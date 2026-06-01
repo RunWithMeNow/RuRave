@@ -1,0 +1,41 @@
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.spinner__ring {
+  display: block;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--accent-primary) 16%, transparent);
+  border-top-color: var(--accent-primary);
+  border-right-color: color-mix(in srgb, var(--accent-primary) 55%, transparent);
+  animation: spinner-rotate 0.75s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent-primary) 28%, transparent);
+}
+
+.spinner--sm .spinner__ring {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+.spinner--md .spinner__ring {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-width: 2.5px;
+}
+
+.spinner--lg .spinner__ring {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-width: 3px;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}

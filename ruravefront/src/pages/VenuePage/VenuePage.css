@@ -1,0 +1,60 @@
+.venue-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--r-spacing-md);
+}
+
+.venue-page__city-row {
+  display: flex;
+  align-items: center;
+  gap: var(--r-spacing-sm);
+}
+
+.venue-page__city-thumb {
+  flex-shrink: 0;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--r-radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+}
+
+.venue-page__city-thumb:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.venue-page__city-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.venue-page__meta {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: var(--lh-normal);
+}
+
+.venue-page__period {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.venue-page__period-count {
+  color: var(--accent-violet);
+  font-weight: 500;
+}
+
+.venue-page__concerts-title {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  margin: 0 0 var(--r-spacing-sm);
+  color: var(--text-primary);
+}
+
+.venue-page__back {
+  margin-top: var(--r-spacing-sm);
+}

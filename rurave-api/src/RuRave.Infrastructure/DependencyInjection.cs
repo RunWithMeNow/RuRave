@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RuRave.Application.Cities;
 using RuRave.Application.Concerts;
+using RuRave.Application.Venues;
 using RuRave.Infrastructure.Persistence;
 using RuRave.Infrastructure.ReadServices;
 
@@ -19,6 +20,7 @@ public static class DependencyInjection
 
         services.AddScoped<ICityReadService, CityReadService>();
         services.AddScoped<IConcertReadService, ConcertReadService>();
+        services.AddScoped<IVenueReadService, VenueReadService>();
 
         return services;
     }

@@ -233,45 +233,7 @@
 }
 
 .concert-page__loading {
-  display: flex;
-  flex-direction: column;
-  gap: var(--r-spacing-md);
-}
-
-.concert-page__skeleton {
-  border-radius: var(--r-radius);
-  background: linear-gradient(
-    90deg,
-    var(--bg-surface) 0%,
-    var(--bg-elevated) 50%,
-    var(--bg-surface) 100%
-  );
-  background-size: 200% 100%;
-  animation: concert-page-shimmer 1.2s ease-in-out infinite;
-}
-
-.concert-page__skeleton--hero {
-  aspect-ratio: 16 / 9;
-  width: 100%;
-}
-
-.concert-page__skeleton--title {
-  height: 2rem;
-  width: 70%;
-}
-
-.concert-page__skeleton--line {
-  height: 1rem;
-  width: 100%;
-}
-
-@keyframes concert-page-shimmer {
-  0% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: -100% 0;
-  }
+  min-height: 14rem;
 }
 
 @media (max-width: 768px) {

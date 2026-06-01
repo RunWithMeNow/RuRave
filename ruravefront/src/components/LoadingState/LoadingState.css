@@ -1,0 +1,26 @@
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-state--block {
+  width: 100%;
+  min-height: 8rem;
+  padding-block: var(--r-spacing-lg);
+}
+
+.loading-state--page {
+  min-height: calc(50vh - var(--header-height));
+  padding-block: calc(var(--header-height) + var(--r-spacing-lg));
+}
+
+.loading-state--section {
+  min-height: 6rem;
+  padding-block: var(--r-spacing-md);
+}
+
+.loading-state--panel {
+  min-height: var(--venue-map-height, 16rem);
+  padding: var(--r-spacing-lg);
+}

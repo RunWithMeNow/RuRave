@@ -10,11 +10,11 @@ public static class TestDatabaseSeeder
     {
         var cities = new[]
         {
-            new City { Name = "Москва", Slug = "moskva", TimeZoneId = "Europe/Moscow" },
-            new City { Name = "Санкт-Петербург", Slug = "sankt-peterburg", TimeZoneId = "Europe/Moscow" },
-            new City { Name = "Новосибирск", Slug = "novosibirsk", TimeZoneId = "Asia/Novosibirsk" },
-            new City { Name = "Казань", Slug = "kazan", TimeZoneId = "Europe/Moscow" },
-            new City { Name = "Екатеринбург", Slug = "ekaterinburg", TimeZoneId = "Asia/Yekaterinburg" }
+            new City { Name = "Москва", Slug = "moskva", TimeZoneId = "Europe/Moscow", ImageUrl = "/cities/moskva.webp" },
+            new City { Name = "Санкт-Петербург", Slug = "sankt-peterburg", TimeZoneId = "Europe/Moscow", ImageUrl = "/cities/sankt-peterburg.webp" },
+            new City { Name = "Новосибирск", Slug = "novosibirsk", TimeZoneId = "Asia/Novosibirsk", ImageUrl = "/cities/novosibirsk.webp" },
+            new City { Name = "Казань", Slug = "kazan", TimeZoneId = "Europe/Moscow", ImageUrl = "/cities/kazan.jpg" },
+            new City { Name = "Екатеринбург", Slug = "ekaterinburg", TimeZoneId = "Asia/Yekaterinburg", ImageUrl = "/cities/ekaterinburg.jpg" }
         };
         db.Cities.AddRange(cities);
         await db.SaveChangesAsync();

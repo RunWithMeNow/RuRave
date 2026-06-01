@@ -1,11 +1,34 @@
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { handleAboutNavClick, handleAfishaNavClick } from '../../utils/homeNavScroll.js';
+import {
+    handleAboutNavClick,
+    handleAfishaNavClick,
+    handleCitiesNavClick,
+    scrollToVenuesSection,
+} from '../../utils/homeNavScroll.js';
+import { useHomeAfishaNavOptional } from '../../context/HomeAfishaNavContext.jsx';
 import './Footer.css';
 import '../../App.css';
 
 const Footer = () => {
     const location = useLocation();
+    const homeAfishaNav = useHomeAfishaNavOptional();
     const year = new Date().getFullYear();
+
+    const handleVenuesNavClick = (event) => {
+        if (location.pathname !== '/') {
+            return;
+        }
+
+        event.preventDefault();
+
+        if (homeAfishaNav) {
+            homeAfishaNav.tryNavigateToVenues();
+            return;
+        }
+
+        scrollToVenuesSection();
+        window.history.replaceState(null, '', '/#venues');
+    };
 
     return (
         <footer className="footer">
@@ -20,11 +43,25 @@ const Footer = () => {
 
                 <nav className="footer__nav" aria-label="Навигация в подвале">
                     <Link
+                        to="/#cities"
+                        className={`footer__link${location.hash === '#cities' ? ' footer__link--active' : ''}`}
+                        onClick={(event) => handleCitiesNavClick(event, location.pathname)}
+                    >
+                        Города
+                    </Link>
+                    <Link
                         to="/#afisha"
-                        className="footer__link"
+                        className={`footer__link${location.hash === '#afisha' ? ' footer__link--active' : ''}`}
                         onClick={(event) => handleAfishaNavClick(event, location.pathname)}
                     >
                         Афиша
+                    </Link>
+                    <Link
+                        to="/#venues"
+                        className="footer__link"
+                        onClick={handleVenuesNavClick}
+                    >
+                        Площадки
                     </Link>
                     <Link
                         to="/#about"

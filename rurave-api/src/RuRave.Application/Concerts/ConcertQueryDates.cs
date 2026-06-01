@@ -13,6 +13,18 @@ public static class ConcertQueryDates
         return (from, to);
     }
 
+    public static (DateOnly From, DateOnly To) ParseRequiredRange(string? dateFrom, string? dateTo)
+    {
+        var (from, to) = ParseRange(dateFrom, dateTo);
+
+        if (from is null || to is null)
+        {
+            throw new InvalidQueryException("Both dateFrom and dateTo are required.");
+        }
+
+        return (from.Value, to.Value);
+    }
+
     public static (DateOnly From, DateOnly To) ParseRequiredWindow(string? from, string? to)
     {
         var fromDate = ParseOptional(from, "from")

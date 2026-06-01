@@ -1,6 +1,13 @@
-const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? '';
+const envBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? '';
+
+function getBaseUrl() {
+    if (envBaseUrl) return envBaseUrl;
+    if (typeof window !== 'undefined') return window.location.origin;
+    return '';
+}
 
 function buildUrl(path, params) {
+    const baseUrl = getBaseUrl();
     const url = new URL(path, baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`);
     if (params) {
         Object.entries(params).forEach(([key, value]) => {
@@ -13,7 +20,7 @@ function buildUrl(path, params) {
 }
 
 async function request(path, params) {
-    if (!baseUrl) {
+    if (!getBaseUrl()) {
         throw new Error('VITE_API_BASE_URL не задан. Скопируйте .env.example в .env');
     }
 
@@ -66,6 +73,22 @@ export async function getConcertDates({ cityId, from, to, search }) {
 
 export async function getConcertById(id) {
     return request(`/api/concerts/${id}`);
+}
+
+export async function getCitiesAfishaSummary({ dateFrom, dateTo }) {
+    return request('/api/cities/afisha-summary', { dateFrom, dateTo });
+}
+
+export async function getCityBySlug(slug, { dateFrom, dateTo }) {
+    return request(`/api/cities/${encodeURIComponent(slug)}`, { dateFrom, dateTo });
+}
+
+export async function getVenues({ cityId, dateFrom, dateTo }) {
+    return request('/api/venues', { cityId, dateFrom, dateTo });
+}
+
+export async function getVenueById(id, { dateFrom, dateTo }) {
+    return request(`/api/venues/${id}`, { dateFrom, dateTo });
 }
 
 export function mapConcertDetailToView(concert) {

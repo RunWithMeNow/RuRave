@@ -36,16 +36,7 @@ public class ConcertReadService(AppDbContext db) : IConcertReadService
             request.DateTo);
 
         var query = BuildPublishedConcertsQuery(request.CityId, searchPattern, hasSearch);
-
-        if (rangeStart.HasValue)
-        {
-            query = query.Where(c => c.StartsAt >= rangeStart.Value);
-        }
-
-        if (rangeEndExclusive.HasValue)
-        {
-            query = query.Where(c => c.StartsAt < rangeEndExclusive.Value);
-        }
+        query = PublishedConcertQuery.InStartsAtRange(query, rangeStart, rangeEndExclusive);
 
         var totalCount = await query.CountAsync(cancellationToken);
 
@@ -147,7 +138,7 @@ public class ConcertReadService(AppDbContext db) : IConcertReadService
             StartsAt = row.StartsAt,
             Place = row.Place,
             VenueAddress = row.VenueAddress,
-            MapSearchQuery = ConcertMapSearchQuery.Build(row.Place, row.VenueAddress),
+            MapSearchQuery = ConcertMapSearchQuery.Build(row.Place, row.VenueAddress, row.CityName),
             CityId = row.CityId,
             CityName = row.CityName,
             Artists = row.Artists,
@@ -184,16 +175,7 @@ public class ConcertReadService(AppDbContext db) : IConcertReadService
             request.To);
 
         var query = BuildPublishedConcertsQuery(request.CityId, searchPattern, hasSearch);
-
-        if (rangeStart.HasValue)
-        {
-            query = query.Where(c => c.StartsAt >= rangeStart.Value);
-        }
-
-        if (rangeEndExclusive.HasValue)
-        {
-            query = query.Where(c => c.StartsAt < rangeEndExclusive.Value);
-        }
+        query = PublishedConcertQuery.InStartsAtRange(query, rangeStart, rangeEndExclusive);
 
         var rows = await query
             .Select(c => new { c.StartsAt, CityTimeZoneId = c.Venue.City.TimeZoneId })
@@ -215,11 +197,7 @@ public class ConcertReadService(AppDbContext db) : IConcertReadService
         string? searchPattern,
         bool hasSearch)
     {
-        var query = db.Concerts
-            .AsNoTracking()
-            .Where(c => c.Venue.CityId == cityId)
-            .Where(c => c.Status == ConcertStatus.Published)
-            .Where(c => c.TicketCategories.Any(tc => tc.IsActive));
+        var query = PublishedConcertQuery.ForCity(db.Concerts.AsNoTracking(), cityId);
 
         if (hasSearch)
         {

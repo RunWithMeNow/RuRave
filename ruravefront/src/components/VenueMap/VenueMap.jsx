@@ -5,6 +5,7 @@ import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 import { geocodeAddress, openStreetMapSearchUrl } from './geocode.js';
+import LoadingState from '../LoadingState/LoadingState.jsx';
 import './VenueMap.css';
 import 'leaflet/dist/leaflet.css';
 import '../../App.css';
@@ -71,9 +72,7 @@ const VenueMap = ({ mapSearchQuery, place, venueAddress }) => {
             </h2>
 
             {loading && (
-                <div className="venue-map__panel venue-map__panel--loading" aria-busy="true">
-                    <p className="venue-map__status">Загрузка карты…</p>
-                </div>
+                <LoadingState label="Загрузка карты" variant="panel" className="venue-map__panel venue-map__panel--loading" />
             )}
 
             {!loading && error && (

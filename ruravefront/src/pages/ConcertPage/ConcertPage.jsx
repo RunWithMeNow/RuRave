@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import LoadingState from '../../components/LoadingState/LoadingState.jsx';
 import HomeMessage from '../../components/HomeMessage/HomeMessage.jsx';
 import BuyTicketModal from '../../components/BuyTicketModal/BuyTicketModal.jsx';
 import VenueMap from '../../components/VenueMap/VenueMap.jsx';
@@ -96,7 +97,7 @@ const ConcertPage = () => {
     };
 
     const dialogTitle = loading
-        ? 'Загрузка концерта'
+        ? 'Концерт'
         : error
           ? 'Концерт'
           : concert?.title ?? 'Концерт';
@@ -127,12 +128,7 @@ const ConcertPage = () => {
 
                 <div className="concert-modal__body">
                     {loading && (
-                        <div className="concert-page__loading" aria-busy="true" aria-label="Загрузка концерта">
-                            <div className="concert-page__skeleton concert-page__skeleton--hero" />
-                            <div className="concert-page__skeleton concert-page__skeleton--title" />
-                            <div className="concert-page__skeleton concert-page__skeleton--line" />
-                            <div className="concert-page__skeleton concert-page__skeleton--line" />
-                        </div>
+                        <LoadingState label="Загрузка концерта" size="lg" variant="block" className="concert-page__loading" />
                     )}
 
                     {!loading && error && (

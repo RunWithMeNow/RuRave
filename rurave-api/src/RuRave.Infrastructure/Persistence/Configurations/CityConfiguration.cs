@@ -26,5 +26,8 @@ public class CityConfiguration : IEntityTypeConfiguration<City>
         builder.Property(c => c.TimeZoneId)
             .IsRequired()
             .HasMaxLength(64);
+
+        builder.Property(c => c.ImageUrl)
+            .HasMaxLength(1000);
     }
 }

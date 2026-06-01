@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import CityImage from '../../components/CityImage/CityImage.jsx';
+import { buildCityPath } from '../../utils/cityImage.js';
 import AboutSection from '../../components/AboutSection/AboutSection.jsx';
+import CitiesSection from '../../components/CitiesSection/CitiesSection.jsx';
+import VenuesSection from '../../components/VenuesSection/VenuesSection.jsx';
 import EventList from '../../components/EventList/EventList.jsx';
-import EventCardSkeletonList from '../../components/EventCardSkeleton/EventCardSkeletonList.jsx';
+import LoadingState from '../../components/LoadingState/LoadingState.jsx';
 import LoadMoreButton from '../../components/LoadMoreButton/LoadMoreButton.jsx';
 import HomeMessage from '../../components/HomeMessage/HomeMessage.jsx';
 import Search from '../../components/Search/Search.jsx';
@@ -16,15 +20,15 @@ import {
     intersectMonthWithRange,
     normalizeDateRange,
 } from '../../utils/dateRange.js';
-import { scrollToAboutSection, scrollToAfishaSection } from '../../utils/homeNavScroll.js';
+import {
+    scrollToAboutSection,
+    scrollToAfishaSection,
+    scrollToCitiesSection,
+} from '../../utils/homeNavScroll.js';
+import { useHomeAfishaNav } from '../../context/HomeAfishaNavContext.jsx';
 import bannerHero from '../../assets/images/banner-hero.png';
 import './HomePage.css';
 import '../../App.css';
-
-const pickDefaultCity = (cities) => {
-    const moscow = cities.find((c) => c.slug === 'moskva');
-    return moscow ?? cities[0] ?? null;
-};
 
 const shuffleConcerts = (items) => {
     const shuffled = [...items];
@@ -37,6 +41,7 @@ const shuffleConcerts = (items) => {
 
 const HomePage = () => {
     const location = useLocation();
+    const { setSelectedCityId: syncSelectedCityId, tryNavigateToVenues } = useHomeAfishaNav();
 
     const [cities, setCities] = useState([]);
     const [citiesLoading, setCitiesLoading] = useState(true);
@@ -195,13 +200,9 @@ const HomePage = () => {
         try {
             const data = await getCities();
             setCities(data);
-            setSelectedCityId((prev) => {
-                if (prev && data.some((city) => city.id === prev)) {
-                    return prev;
-                }
-                const defaultCity = pickDefaultCity(data);
-                return defaultCity?.id ?? null;
-            });
+            setSelectedCityId((prev) =>
+                prev && data.some((city) => city.id === prev) ? prev : null
+            );
         } catch (err) {
             setCitiesError(err instanceof Error ? err.message : 'Не удалось загрузить города');
         } finally {
@@ -214,12 +215,20 @@ const HomePage = () => {
     }, [loadCities]);
 
     useEffect(() => {
+        syncSelectedCityId(selectedCityId);
+    }, [selectedCityId, syncSelectedCityId]);
+
+    useEffect(() => {
         if (location.hash === '#about') {
             scrollToAboutSection();
         } else if (location.hash === '#afisha') {
             scrollToAfishaSection();
+        } else if (location.hash === '#cities') {
+            scrollToCitiesSection();
+        } else if (location.hash === '#venues') {
+            tryNavigateToVenues();
         }
-    }, [location.hash]);
+    }, [location.hash, tryNavigateToVenues]);
 
     useEffect(() => {
         if (selectedCityId) {
@@ -296,6 +305,16 @@ const HomePage = () => {
         setConcertsPage(1);
         setConcertsError(null);
         setConcertDates([]);
+    };
+
+    const handleCitySelectFromCities = (city) => {
+        setSelectedCityId(city.id);
+        setSearchTerm('');
+        setConcerts([]);
+        setTotalCount(0);
+        setConcertsPage(1);
+        scrollToAfishaSection();
+        window.history.replaceState(null, '', '/#afisha');
     };
 
     const handleSearch = (term) => {
@@ -408,6 +427,7 @@ const HomePage = () => {
                 imageUrl={bannerHero}
                 alt="Концерт: толпа в зале, яркий свет сцены — RuRave"
             />
+            <CitiesSection dateRange={dateRange} onCitySelect={handleCitySelectFromCities} />
             <div
                 id="afisha"
                 className="home__content"
@@ -460,12 +480,8 @@ const HomePage = () => {
                 )}
 
                 {concertsInitialLoading && selectedCityId && !citiesError && (
-                    <section
-                        className="home__concerts"
-                        aria-busy="true"
-                        aria-label="Загрузка концертов"
-                    >
-                        <EventCardSkeletonList />
+                    <section className="home__concerts" aria-labelledby="home-concerts-heading">
+                        <LoadingState label="Загрузка концертов" size="lg" variant="section" />
                     </section>
                 )}
 
@@ -486,15 +502,30 @@ const HomePage = () => {
                         aria-busy={concertsRefreshing}
                     >
                         <header className="home__concerts-header">
-                            <h2 id="home-concerts-heading" className="home__concerts-title">
-                                Концерты
-                                {selectedCity ? ` в ${selectedCity.name}` : ''}
-                            </h2>
-                            <p className="home__concerts-count">
-                                {concerts.length < totalCount
-                                    ? `Показано ${concerts.length} из ${totalCount}`
-                                    : concertsCountLabel}
-                            </p>
+                            {selectedCity?.imageUrl && (
+                                <Link
+                                    to={buildCityPath(selectedCity.slug, dateRange)}
+                                    className="home__concerts-city-visual"
+                                    aria-label={`Страница города ${selectedCity.name}`}
+                                >
+                                    <CityImage
+                                        className="home__concerts-city-image"
+                                        imageUrl={selectedCity.imageUrl}
+                                        alt={selectedCity.name}
+                                    />
+                                </Link>
+                            )}
+                            <div className="home__concerts-header-text">
+                                <h2 id="home-concerts-heading" className="home__concerts-title">
+                                    Концерты
+                                    {selectedCity ? ` в ${selectedCity.name}` : ''}
+                                </h2>
+                                <p className="home__concerts-count">
+                                    {concerts.length < totalCount
+                                        ? `Показано ${concerts.length} из ${totalCount}`
+                                        : concertsCountLabel}
+                                </p>
+                            </div>
                         </header>
                         <EventList concerts={concerts} />
                         {hasMoreConcerts && (
@@ -542,7 +573,7 @@ const HomePage = () => {
                             )}
                         </header>
                         {allConcertsInitialLoading ? (
-                            <EventCardSkeletonList />
+                            <LoadingState label="Загрузка концертов" size="lg" variant="section" />
                         ) : (
                             <>
                                 <EventList concerts={visibleAllConcerts} />
@@ -556,6 +587,11 @@ const HomePage = () => {
                     </section>
                 )}
             </div>
+            <VenuesSection
+                cityId={selectedCityId}
+                cityName={selectedCity?.name ?? ''}
+                dateRange={dateRange}
+            />
             <AboutSection />
         </div>
     );

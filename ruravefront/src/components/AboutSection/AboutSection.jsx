@@ -21,7 +21,7 @@ const AboutSection = () => {
                     <div className="home-about__content">
                         <p className="home-about__text">{ABOUT_INTRO}</p>
                         <p className="home-about__text">
-                            <strong>В текущей версии MVP доступны:</strong>
+                            <strong>Что уже работает в этой версии:</strong>
                         </p>
                         <ul className="home-about__list">
                             {ABOUT_MVP_ITEMS.map((item) => (

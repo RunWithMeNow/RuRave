@@ -6,6 +6,7 @@
 
 .load-more__button {
   min-width: 12rem;
+  min-height: 2.75rem;
   padding: var(--r-spacing-sm) var(--r-spacing-lg);
   font-size: var(--fs-md);
   font-family: var(--font-family);
@@ -14,6 +15,10 @@
   border: none;
   border-radius: var(--r-radius);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--r-spacing-xs);
   transition:
     background-color var(--tr),
     opacity var(--tr),
@@ -30,6 +35,13 @@
 }
 
 .load-more__button:disabled {
-  opacity: 0.7;
+  opacity: 0.85;
   cursor: wait;
+}
+
+.load-more__button:disabled .spinner__ring {
+  border-top-color: var(--text-on-accent);
+  border-right-color: color-mix(in srgb, var(--text-on-accent) 55%, transparent);
+  border-color: color-mix(in srgb, var(--text-on-accent) 25%, transparent);
+  box-shadow: none;
 }

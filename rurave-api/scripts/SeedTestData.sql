@@ -64,19 +64,21 @@ DECLARE @Cities TABLE (
 
     [Slug]       NVARCHAR(100) NOT NULL,
 
-    [TimeZoneId] NVARCHAR(64)  NOT NULL
+    [TimeZoneId] NVARCHAR(64)  NOT NULL,
+
+    [ImageUrl]   NVARCHAR(1000) NULL
 
 );
 
 
 
-INSERT INTO @Cities ([Id], [Name], [Slug], [TimeZoneId]) VALUES
+INSERT INTO @Cities ([Id], [Name], [Slug], [TimeZoneId], [ImageUrl]) VALUES
 
-    (1, N'Москва',          N'moskva',          N'Europe/Moscow'),
+    (1, N'Москва',          N'moskva',          N'Europe/Moscow',       N'/cities/moskva.webp'),
 
-    (2, N'Санкт-Петербург', N'sankt-peterburg', N'Europe/Moscow'),
+    (2, N'Санкт-Петербург', N'sankt-peterburg', N'Europe/Moscow',       N'/cities/sankt-peterburg.webp'),
 
-    (3, N'Новосибирск',     N'novosibirsk',     N'Asia/Novosibirsk');
+    (3, N'Новосибирск',     N'novosibirsk',     N'Asia/Novosibirsk',    N'/cities/novosibirsk.webp');
 
 
 
@@ -542,9 +544,9 @@ BEGIN TRY
 
     SET IDENTITY_INSERT dbo.[Cities] ON;
 
-    INSERT INTO dbo.[Cities] ([Id], [Name], [Slug], [TimeZoneId])
+    INSERT INTO dbo.[Cities] ([Id], [Name], [Slug], [TimeZoneId], [ImageUrl])
 
-    SELECT [Id], [Name], [Slug], [TimeZoneId] FROM @Cities;
+    SELECT [Id], [Name], [Slug], [TimeZoneId], [ImageUrl] FROM @Cities;
 
     SET IDENTITY_INSERT dbo.[Cities] OFF;
 

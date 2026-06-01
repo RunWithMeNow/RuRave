@@ -1,13 +1,39 @@
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { handleAboutNavClick, handleAfishaNavClick } from '../../utils/homeNavScroll.js';
+import {
+    handleAboutNavClick,
+    handleAfishaNavClick,
+    handleCitiesNavClick,
+    scrollToVenuesSection,
+} from '../../utils/homeNavScroll.js';
+import { useHomeAfishaNavOptional } from '../../context/HomeAfishaNavContext.jsx';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/scrollLock.js';
+import logoIcon from '../../assets/icons/logo.png';
 import './Header.css';
 import '../../App.css';
 
 const Header = () => {
     const location = useLocation();
+    const homeAfishaNav = useHomeAfishaNavOptional();
     const [menuOpen, setMenuOpen] = useState(false);
+
+    const handleVenuesNavClick = (event, onNavigate) => {
+        onNavigate?.();
+        if (location.pathname !== '/') {
+            return;
+        }
+
+        event.preventDefault();
+
+        if (homeAfishaNav) {
+            homeAfishaNav.tryNavigateToVenues();
+            return;
+        }
+
+        scrollToVenuesSection();
+        window.history.replaceState(null, '', '/#venues');
+    };
 
     const closeMenu = useCallback(() => {
         setMenuOpen(false);
@@ -41,6 +67,13 @@ const Header = () => {
     const navLinks = (onNavigate = undefined) => (
         <>
             <Link
+                to="/#cities"
+                className="header__page-link"
+                onClick={(event) => handleCitiesNavClick(event, location.pathname, onNavigate)}
+            >
+                <span className="header__page-text">Города</span>
+            </Link>
+            <Link
                 to="/#afisha"
                 className="header__page-link"
                 onClick={(event) => handleAfishaNavClick(event, location.pathname, onNavigate)}
@@ -48,8 +81,15 @@ const Header = () => {
                 <span className="header__page-text">Афиша</span>
             </Link>
             <Link
+                to="/#venues"
+                className="header__page-link"
+                onClick={(event) => handleVenuesNavClick(event, onNavigate)}
+            >
+                <span className="header__page-text">Площадки</span>
+            </Link>
+            <Link
                 to="/#about"
-                className={`header__page-link${location.hash === '#about' ? ' header__page-link--active' : ''}`}
+                className="header__page-link"
                 onClick={(event) => handleAboutNavClick(event, location.pathname, onNavigate)}
             >
                 <span className="header__page-text">О проекте</span>
@@ -58,9 +98,10 @@ const Header = () => {
     );
 
     return (
+        <>
         <header className="header__container">
             <NavLink to="/" end className="header__brand" aria-label="RuRave — на главную">
-                <img className="header__logo" src="/src/assets/icons/logo.png" alt="" />
+                <img className="header__logo" src={logoIcon} alt="" />
                 <span className="header__brand-title">
                     <span className="header__title-white">Ru</span>
                     <span className="header__title-violet">Rave</span>
@@ -86,8 +127,10 @@ const Header = () => {
                     <span aria-hidden="true">☰</span>
                 </button>
             </div>
+        </header>
 
-            {menuOpen && (
+        {menuOpen
+            && createPortal(
                 <div className="header__overlay" onClick={closeMenu}>
                     <nav
                         id="header-mobile-nav"
@@ -108,9 +151,10 @@ const Header = () => {
                         </div>
                         <div className="header__mobile-links">{navLinks(closeMenu)}</div>
                     </nav>
-                </div>
+                </div>,
+                document.body
             )}
-        </header>
+        </>
     );
 };
 

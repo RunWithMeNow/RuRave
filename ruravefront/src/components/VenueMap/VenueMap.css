@@ -27,23 +27,9 @@
 }
 
 .venue-map__panel--loading {
-  background: linear-gradient(
-    90deg,
-    var(--bg-surface) 0%,
-    var(--bg-elevated) 50%,
-    var(--bg-surface) 100%
-  );
-  background-size: 200% 100%;
-  animation: venue-map-shimmer 1.2s ease-in-out infinite;
-}
-
-@keyframes venue-map-shimmer {
-  0% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: -100% 0;
-  }
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-radius);
 }
 
 .venue-map__status {

@@ -113,6 +113,12 @@ cd scripts
 
 **Кириллица в БД «кракозябрами»:** перезапустите seed через `.\seed.ps1` — не вызывайте `sqlcmd -i SeedTestData.sql` без кодовой страницы UTF-8. В SSMS открывайте `.sql` как UTF-8 with signature.
 
+**Дополнение без очистки:** `scripts/SeedAdditionalCities.sql` — в одной транзакции добавляет 4 города (Казань, Екатеринбург, Нижний Новгород, Краснодар), по 3 площадки и по 5 концертов на город. Повторный запуск пропускает уже существующие записи (по `Slug` / паре город+площадка).
+
+```powershell
+sqlcmd -S localhost -d RuRaveDB -E -C -i SeedAdditionalCities.sql -b -f i:65001
+```
+
 ## Запуск API
 
 ```bash
@@ -142,7 +148,7 @@ JSON — **camelCase** (`id`, `imageUrl`, `startsAt`, `minPrice`, …).
 
 ```json
 [
-  { "id": 1, "name": "Москва", "slug": "moskva" }
+  { "id": 1, "name": "Москва", "slug": "moskva", "imageUrl": "/cities/moskva.svg" }
 ]
 ```
 
@@ -196,7 +202,7 @@ JSON — **camelCase** (`id`, `imageUrl`, `startsAt`, `minPrice`, …).
   "startsAt": "2026-12-12T20:00:00+03:00",
   "place": "Циркус",
   "venueAddress": "Цветной бульвар, 13, Москва",
-  "mapSearchQuery": "Москва, Цветной бульвар, 13, Москва",
+  "mapSearchQuery": "Цветной бульвар, 13, Москва",
   "cityId": 1,
   "cityName": "Москва",
   "artists": ["DK"],

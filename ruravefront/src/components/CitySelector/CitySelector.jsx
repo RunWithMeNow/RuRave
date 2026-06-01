@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import Spinner from '../Spinner/Spinner.jsx';
+import placeIcon from '../../assets/icons/place.png';
 import './CitySelector.css';
 import '../../App.css';
 
@@ -59,11 +61,7 @@ const CitySelector = ({
         city.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const triggerLabel = disabled
-        ? 'Загрузка городов...'
-        : selectedCity
-          ? selectedCity.name
-          : 'Выбери город';
+    const triggerLabel = selectedCity ? selectedCity.name : 'Выбери город';
 
     const canReset = Boolean(selectedCityId) && !disabled && onCityReset;
 
@@ -92,10 +90,17 @@ const CitySelector = ({
                 >
                     <img
                         className="city-selector__icon"
-                        src="/src/assets/icons/place.png"
+                        src={placeIcon}
                         alt=""
                     />
-                    {triggerLabel}
+                    {disabled ? (
+                        <>
+                            <Spinner size="sm" label="Загрузка городов" />
+                            <span className="sr-only">Загрузка городов</span>
+                        </>
+                    ) : (
+                        triggerLabel
+                    )}
                     <span className={`city-selector__arrow ${isOpen ? 'open' : ''}`} aria-hidden="true">
                         ▼
                     </span>

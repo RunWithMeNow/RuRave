@@ -15,6 +15,7 @@ import {
     normalizeDateRange,
     parseIsoDate,
 } from '../../utils/dateRange.js';
+import dateIcon from '../../assets/icons/date.png';
 import './DateFilter.css';
 import '../../App.css';
 
@@ -230,7 +231,7 @@ const DateFilter = ({
             >
                 <img
                     className="date-filter__icon"
-                    src="/src/assets/icons/date.png"
+                    src={dateIcon}
                     alt=""
                 />
                 <span className="date-filter__label">

@@ -1,5 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
 import micPlaceholder from '../../assets/icons/microphone placeholder.png';
+import dateIcon from '../../assets/icons/date.png';
+import placeIcon from '../../assets/icons/place.png';
+import microphoneIcon from '../../assets/icons/microphone.png';
 import './EventCard.css';
 import '../../App.css';
 
@@ -22,7 +25,7 @@ const EventCard = ({ id, title, date, place, artist, cost }) => {
                 <li className="event-card__info">
                     <img
                         className="event-card__icon"
-                        src="/src/assets/icons/date.png"
+                        src={dateIcon}
                         alt=""
                     />
                     <p className="event-card__text">{date}</p>
@@ -30,7 +33,7 @@ const EventCard = ({ id, title, date, place, artist, cost }) => {
                 <li className="event-card__info">
                     <img
                         className="event-card__icon"
-                        src="/src/assets/icons/place.png"
+                        src={placeIcon}
                         alt=""
                     />
                     <p className="event-card__text">{place}</p>
@@ -38,7 +41,7 @@ const EventCard = ({ id, title, date, place, artist, cost }) => {
                 <li className="event-card__info">
                     <img
                         className="event-card__icon"
-                        src="/src/assets/icons/microphone.png"
+                        src={microphoneIcon}
                         alt=""
                     />
                     <p className="event-card__text">{artist}</p>

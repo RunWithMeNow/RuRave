@@ -10,5 +10,7 @@ public class City
 
     public string TimeZoneId { get; set; } = null!;
 
+    public string? ImageUrl { get; set; }
+
     public ICollection<Venue> Venues { get; set; } = [];
 }
